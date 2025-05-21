@@ -147,7 +147,7 @@
   vars:
     new_install_password: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
     rhn_username: "{{ lookup('env', 'RHN_USERNAME') }}"
-    rhn_password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+    rhn_password: "{{ lookup('env', 'RHSM_OFFLINE_TOKEN') }}"
 
 - name: Set the system hostname for the AAP installer
   become: true
