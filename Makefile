@@ -1,4 +1,3 @@
-
 rhel_9_base:
 	packer init -var-file variables/base_rhel.pkrvars.hcl builds/linux/rhel/9
 	packer build -var-file variables/base_rhel.pkrvars.hcl builds/linux/rhel/9

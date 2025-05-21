@@ -10,9 +10,9 @@ on:
         options:
           - all
           - rhel_9_base
-          - rhel_9_app_containerized
-          - rhel_9_aap_workflow
+          - aap_demo
           - rhel_9_aap_job
+          - rhel_9_aap_workflow
   # push:
   #   branches:
   #     - main
@@ -25,7 +25,7 @@ env:
   # HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
   # HCP_PROJECT_ID: ${{ secrets.HCP_PROJECT_ID }}
   # HCP_ORGANIZATION_ID: ${{ secrets.HCP_ORGANIZATION_ID }}
-  DEFAULT_IMAGES: rhel_9_base, rhel_9_app_containerized
+  DEFAULT_IMAGES: rhel_9_base, aap_demo
   CONTROLLER_VERIFY_SSL: false
   CONTROLLER_HOST: ${{ secrets.CONTROLLER_HOST }}
   CONTROLLER_USERNAME: ${{ secrets.CONTROLLER_USERNAME }}
