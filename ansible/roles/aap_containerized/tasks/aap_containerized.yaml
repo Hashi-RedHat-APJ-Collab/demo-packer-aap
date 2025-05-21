@@ -44,9 +44,18 @@
     path: "/tmp/ansible-automation-platform-containerized-setup-2.5-13.tar.gz"
   register: file_info
 
+- name: Debug - Show file info
+  ansible.builtin.debug:
+    var: file_info
+
 - name: Manually extract the installer
   ansible.builtin.command:
-    cmd: "tar xfvz ansible-automation-platform-containerized-setup-2.4-2.tar.gz -C /tmp/"
+    cmd: "tar xfvz /tmp/ansible-automation-platform-containerized-setup-2.5-13.tar.gz -C /tmp/"
+  register: extract_result
+
+- name: Debug - Show extract result
+  ansible.builtin.debug:
+    var: extract_result
 
 - name: Find the top-level extracted directory matching the expected pattern
   ansible.builtin.find:
@@ -86,7 +95,6 @@
     create: true
     backup: true
   become: true
-
 
 - name: Run AAP installer playbook
   ansible.builtin.command:
