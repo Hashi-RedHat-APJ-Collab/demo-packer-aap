@@ -1,0 +1,76 @@
+# This section is for your AAP Gateway host(s)
+# -----------------------------------------------------
+[automationgateway]
+{{ aap_hostname }}
+
+# This section is for your AAP Controller host(s)
+# -----------------------------------------------------
+[automationcontroller]
+{{ aap_hostname }}
+
+# This section is for your AAP Automation Hub host(s)
+# -----------------------------------------------------
+[automationhub]
+{{ aap_hostname }}
+
+# This section is for your AAP EDA Controller host(s)
+# -----------------------------------------------------
+[automationeda]
+{{ aap_hostname }}
+
+# This section is for the AAP database
+# -----------------------------------------------------
+[database]
+{{ aap_hostname }}
+
+[all:vars]
+# Ansible
+
+ee_minimal_image=ee-minimal-rhel9:latest
+ee_supported_image=ee-supported-rhel9:latest
+de_supported_image=de-supported-rhel9:latest
+
+# Common variables
+postgresql_admin_username=postgres
+postgresql_admin_password={{ new_install_password }}
+
+registry_username={{ rhn_username }}
+registry_password={{ rhn_password }}
+
+redis_mode=standalone
+
+# AAP Gateway
+gateway_admin_password={{ new_install_password }}
+gateway_pg_host={{ aap_hostname }}
+gateway_pg_password={{ new_install_password }}
+
+# AAP Controller
+controller_admin_password={{ new_install_password }}
+controller_pg_host={{ aap_hostname }}
+controller_pg_password={{ new_install_password }}
+
+# AAP Automation Hub
+hub_admin_password={{ new_install_password }}
+hub_pg_host={{ aap_hostname }}
+hub_pg_password={{ new_install_password }}
+
+# AAP EDA Controller
+eda_admin_password={{ new_install_password }}
+eda_pg_host={{ aap_hostname }}
+eda_pg_password={{ new_install_password }}
+
+#configure a HAProxy load balancer in front of platform gateway with a custom CA cert
+# NOTE: HAProxy SSL passthrough mode is not supported with platform gateway
+#custom_ca_cert=<path_to_cert_crt>
+#gateway_main_url=<https://load_balancer_url>
+
+#configure shared storage for automation hub
+#ensuring your network file system (NFS) share has read, write, and execute permissions
+#hub_shared_data_path=<path_to_nfs_share>:/
+#hub_shared_data_mount_opts='nfsvers=4.1,hard,noresvport,rsize=1048576,wsize=1048576,timeo=600,retrans=2,_netdev,nofail'
+
+#define the location of your automation controller license file
+controller_license_file=/home/ec2-user/manifest_AAP_Demo.zip
+#deploy remote execution nodes
+#[execution_nodes]
+#<fqdn_of_your_execution_host> 

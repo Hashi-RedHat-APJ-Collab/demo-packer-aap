@@ -47,3 +47,35 @@
     src: "/tmp/ansible-automation-platform-containerized-setup-2.5-13.tar.gz"
     dest: "/tmp/"
     remote_src: yes
+
+- name: Update inventory file with template
+  ansible.builtin.template:
+    src: inventory-growth.j2
+    dest: "/tmp/inventory-growth"
+    mode: '0644'
+  vars:
+    aap_hostname: "{{ aap_hostname }}"
+    new_install_password: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
+    rhn_username: "{{ lookup('env', 'RHN_USERNAME') }}"
+    rhn_password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+
+- name: Set the system hostname for the AAP installer
+  become: true
+  ansible.builtin.command: hostnamectl set-hostname {{ aap_hostname }}
+
+- name: Add entry to /etc/hosts for {{ installer_fqdn_hostname }}
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "127.0.0.1 {{ aap_hostname }}"
+    state: present
+    create: true
+    backup: true
+  become: true
+
+# ansible-playbook -i ${INVENTORY_FILENAME} ansible.containerized_installer.install
+- name: Run AAP installer playbook
+  ansible.builtin.command:
+    cmd: ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
+  register: install_result
+  become: true
+
