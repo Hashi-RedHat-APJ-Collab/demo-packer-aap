@@ -13,9 +13,9 @@ on:
           - rhel_9_app_containerized
           - rhel_9_aap_workflow
           - rhel_9_aap_job
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   pull_request:
     branches:
       - main
