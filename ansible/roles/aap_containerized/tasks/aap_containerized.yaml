@@ -147,7 +147,8 @@
   vars:
     new_install_password: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
     registry_username: "{{ lookup('env', 'RHN_REGISTRY_SVC') }}"
-    registry_password: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
+    registry_auth_token: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
+
 
 - name: Set the system hostname for the AAP installer
   become: true
