@@ -86,7 +86,7 @@
 
 - name: Download manifest file
   ansible.builtin.uri:
-    url: "https://api.access.redhat.com/management/v1/allocations/{{ lookup('env', 'RHSM_ALLOCATION_UUID') }}/export/{{ poll_result.json.body.exportJobID }}"
+    url: "https://api.access.redhat.com/management/v1/allocations/{{ lookup('env', 'RHSM_ALLOCATION_UUID') }}/export/{{ poll_result.json.body.exportID }}"
     method: GET
     headers:
       Authorization: "Bearer {{ rhsm_token.json.access_token }}"
