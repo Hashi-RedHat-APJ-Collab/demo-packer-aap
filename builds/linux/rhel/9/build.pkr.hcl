@@ -74,6 +74,7 @@ build {
 
   provisioner "ansible" {
     playbook_file = "${path.cwd}/ansible/playbook.yml"
+    use_sftp      = false
     galaxy_file   = "${path.cwd}/ansible/requirements.yml"
     user          = var.os_username
 
