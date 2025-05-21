@@ -69,7 +69,7 @@
     headers:
       Authorization: "Bearer {{ rhsm_token.json.access_token }}"
       Accept: "application/json"
-    status_code: [200, 404]
+    status_code: 200
   register: poll_result
   until: poll_result.status == 200
   retries: 15
