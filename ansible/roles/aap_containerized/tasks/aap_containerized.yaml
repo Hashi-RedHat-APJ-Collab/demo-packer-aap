@@ -48,7 +48,7 @@
   register: rhsm_token
   no_log: false
 
-- name: Download AAP manifest
+- name: Request manifest export
   ansible.builtin.uri:
     url: "https://api.access.redhat.com/management/v1/allocations/{{ lookup('env', 'RHSM_ALLOCATION_UUID') }}/export"
     method: GET
@@ -58,10 +58,38 @@
     status_code: 200
   register: manifest_download_id
 
-
 - name: Debug - Show manifest download result
   ansible.builtin.debug:
-    var: manifest_download
+    var: manifest_download_id
+
+- name: Poll for manifest readiness
+  ansible.builtin.uri:
+    url: "https://api.access.redhat.com/management/v1/allocations/{{ lookup('env', 'RHSM_ALLOCATION_UUID') }}/exportJob/{{ manifest_download_id.json.body.exportJobID }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ rhsm_token.json.access_token }}"
+      Accept: "application/json"
+    status_code: [200, 404]
+  register: poll_result
+  until: poll_result.status == 200
+  retries: 15
+  delay: 5
+  changed_when: false
+
+- name: Download manifest file
+  ansible.builtin.uri:
+    url: "https://api.access.redhat.com/management/v1/allocations/{{ lookup('env', 'RHSM_ALLOCATION_UUID') }}/export/{{ manifest_download_id.json.body.exportJobID }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ rhsm_token.json.access_token }}"
+      Accept: "application/zip"
+    dest: "/tmp/manifest_AAP_Demo.zip"
+    force: true
+  register: manifest_file
+
+- name: Debug - Show manifest file download result
+  ansible.builtin.debug:
+    var: manifest_file
 
 - name: Download Ansible Automation Platform setup file
   ansible.builtin.get_url:
