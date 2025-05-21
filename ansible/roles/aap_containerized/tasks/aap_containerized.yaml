@@ -76,9 +76,17 @@
   delay: 5
   changed_when: false
 
+- name: Debug - Show poll result
+  ansible.builtin.debug:
+    var: poll_result
+
+- name: Check manifest export status
+  ansible.builtin.debug:
+    msg: "Manifest export status: {{ poll_result.json }}"
+
 - name: Download manifest file
   ansible.builtin.uri:
-    url: "https://api.access.redhat.com/management/v1/allocations/{{ lookup('env', 'RHSM_ALLOCATION_UUID') }}/export/{{ manifest_download_id.json.body.exportJobID }}"
+    url: "https://api.access.redhat.com/management/v1/allocations/{{ lookup('env', 'RHSM_ALLOCATION_UUID') }}/export/{{ poll_result.json.body.exportJobID }}"
     method: GET
     headers:
       Authorization: "Bearer {{ rhsm_token.json.access_token }}"
