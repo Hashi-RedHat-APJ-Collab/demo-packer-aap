@@ -17,6 +17,27 @@
     - RHN_REGISTRY_SVC
     - RHN_REGISTRY_TOKEN
 
+ # create aap user  adduser aap
+- name: Create AAP user
+  ansible.builtin.user:
+    name: aap
+    password: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') | password_hash('sha512') }}"
+    shell: /bin/bash
+    create_home: true
+    home: /home/aap
+    state: present
+  become: true
+  register: aap_user
+
+# add aap user to sudoers but don't make root
+- name: Add AAP user to wheel group
+  ansible.builtin.user:
+    name: aap
+    groups: wheel
+    append: true
+  become: true
+
+
 - name: Register subscription for RHEL
   when: ansible_os_family == 'RedHat'
   community.general.redhat_subscription:
@@ -149,8 +170,6 @@
   ansible.builtin.set_fact:
     aap_hostname: "{{ aap_hostname | default('aap.example.org') }}"
 
-
-
 - name: Update inventory file with template
   ansible.builtin.template:
     src: inventory-growth.j2
@@ -158,8 +177,8 @@
     mode: '0644'
   vars:
     new_install_password: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
-    #registry_username: "{{ lookup('env', 'RHN_REGISTRY_SVC') }}"
-    #registry_auth_token: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
+    ansible_become_pass: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
+    registry_password: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
 
 # check if the inventory file was created
 - name: Check if inventory file exists
@@ -189,11 +208,24 @@
     backup: true
   become: true
 
+- name: Test Red Hat registry connectivity
+  ansible.builtin.uri:
+    url: https://registry.redhat.io
+    method: GET
+    status_code: 200 # Expect a 200 OK response
+    validate_certs: false # Set to true if you want to validate SSL certs
+  register: uri_result
+  ignore_errors: true
+
+- name: Display URI result
+  ansible.builtin.debug:
+    msg: "URI access result for registry.redhat.io: {{ uri_result }}"
+
+
 - name: Run AAP installer playbook
   ansible.builtin.command:
-    cmd: bash -lc "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
+    cmd: bash -lc "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_BECOME_PASS='{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}' ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
   register: install_result
-  become: false
 
 - name: Check if the installation was successful
   ansible.builtin.debug:
