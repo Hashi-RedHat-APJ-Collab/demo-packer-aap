@@ -30,8 +30,39 @@
           - git-core
           - rsync
           - vim
+          - jq
+          - curl
         state: present
       become: true
+
+- name: Get RHSM access token
+  ansible.builtin.uri:
+    url: "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      grant_type: password
+      client_id: rhsm-api
+      username: "{{ lookup('env', 'RHN_USERNAME') }}"
+      password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+    status_code: 200
+  register: rhsm_token
+  no_log: true
+
+- name: Download AAP manifest
+  ansible.builtin.uri:
+    url: "https://api.access.redhat.com/management/v1/allocations/{{ lookup('env', 'RHSM_ALLOCATION_UUID') }}/export"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ rhsm_token.json.access_token }}"
+      Accept: "application/json"
+    dest: "/tmp/manifest_AAP_Demo.zip"
+    force: true
+  register: manifest_download
+
+- name: Debug - Show manifest download result
+  ansible.builtin.debug:
+    var: manifest_download
 
 - name: Download Ansible Automation Platform setup file
   ansible.builtin.get_url:
