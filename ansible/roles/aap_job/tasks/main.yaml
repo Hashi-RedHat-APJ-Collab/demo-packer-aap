@@ -1,0 +1,2 @@
+---
+- include_tasks: job_launch.yaml

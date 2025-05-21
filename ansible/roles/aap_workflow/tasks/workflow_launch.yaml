@@ -1,0 +1,13 @@
+---
+- name: Launch a workflow template with extra_vars on remote controller instance when project is set
+  ansible.controller.workflow_launch:
+    controller_host: "{{ CONTROLLER_HOST }}"
+    controller_username: "{{ CONTROLLER_USERNAME }}"
+    controller_password: "{{ CONTROLLER_PASSWORD }}"
+    name: "Packer_Template"
+    validate_certs: false
+  register: workflow_output
+
+- name: Print out workflow_output
+  debug:
+    var: workflow_output

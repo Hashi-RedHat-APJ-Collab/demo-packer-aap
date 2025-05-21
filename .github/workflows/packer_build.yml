@@ -1,0 +1,117 @@
+name: Packer Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      singleBuild:
+        type: choice
+        description: image override
+        required: false
+        options:
+          - all
+          - rhel_9_base
+          - rhel_9_app_containerized
+          - rhel_9_aap_workflow
+          - rhel_9_aap_job
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  # HCP_CLIENT_ID: ${{ secrets.HCP_CLIENT_ID }}
+  # HCP_CLIENT_SECRET: ${{ secrets.HCP_CLIENT_SECRET }}
+  # HCP_PROJECT_ID: ${{ secrets.HCP_PROJECT_ID }}
+  # HCP_ORGANIZATION_ID: ${{ secrets.HCP_ORGANIZATION_ID }}
+  DEFAULT_IMAGES: rhel_9_base, rhel_9_app_containerized
+  CONTROLLER_VERIFY_SSL: false
+  CONTROLLER_HOST: ${{ secrets.CONTROLLER_HOST }}
+  CONTROLLER_USERNAME: ${{ secrets.CONTROLLER_USERNAME }}
+  CONTROLLER_PASSWORD: ${{ secrets.CONTROLLER_PASSWORD }}
+  CONTROLLER_PROJECT: "Packer_Project"
+  ANSIBLE_OFFLINE_TOKEN: ${{ secrets.ANSIBLE_OFFLINE_TOKEN }}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  selectimages:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: get-images
+        id: get-images
+        run: |
+          if [[ "${{ inputs.singleBuild }}" != "all" ]] && [[ -n "${{ github.event.inputs.singleBuild }}" ]]; then
+            export IMAGES=$(echo ${{ inputs.singleBuild }} | jq -R '["\(.)"]')
+            echo "images_out"=$IMAGES""
+            echo "images_out"=$IMAGES"" >> $GITHUB_OUTPUT
+          else
+            export IMAGES=$(echo $DEFAULT_IMAGES | jq -R 'split(", ")')
+            echo "images_out"=$IMAGES""
+            echo "images_out"=$IMAGES"" >> $GITHUB_OUTPUT
+          fi
+    outputs:
+      images: ${{ steps.get-images.outputs.images_out }}
+  build_images:
+    runs-on: "ubuntu-latest"
+    needs: [selectimages]
+    strategy:
+      matrix:
+        image_type: ${{fromJson(needs.selectimages.outputs.images)}}
+    steps:
+      - uses: FraBle/clean-after-action@v1
+      
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Ansible
+        uses: alex-oleshkevich/setup-ansible@v1.0.1
+        with:
+          version: 11.5.0
+
+      - name: Print Ansible version
+        run: ansible-playbook --version
+      
+      - name: Create ansible.cfg
+        run: |
+          cat > ~/.ansible.cfg << EOF
+          [galaxy]
+          server_list = automation_hub
+
+          [galaxy_server.automation_hub]
+          url=https://console.redhat.com/api/automation-hub/
+          auth_url=https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+          token=${{ secrets.ANSIBLE_OFFLINE_TOKEN }}
+          EOF
+          chmod 600 ~/.ansible.cfg
+        
+      - name: Run Makefile with retries
+        shell: bash
+        run: |
+          max_attempts=1
+          attempt=1
+          until make ${{ matrix.image_type }} || [ $attempt -eq $max_attempts ]
+          do
+            echo "Attempt $attempt failed! Retrying in 30 seconds..."
+            attempt=$(( attempt + 1 ))
+            sleep 30
+          done
+          
+          if [ $attempt -eq $max_attempts ] && ! make ${{ matrix.image_type }}; then
+            echo "All $max_attempts attempts failed"
+            exit 1
+          fi
+
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with: 
+      #     role-to-assume: arn:aws:iam::124355636080:role/DynamicCredsHCP-GitHubActionsServiceRole-74Kqdhl1FtBW
+      #     role-session-name: GitHubActionsServiceRole
+      #     role-duration-seconds: 900
+      #     aws-region: ap-southeast-1
+        
+
+      

@@ -1,0 +1,21 @@
+---
+- name: Update RHEL-based systems
+  when: ansible_os_family == 'RedHat'
+  ansible.builtin.dnf:
+    name: '*'
+    state: latest
+    update_cache: true
+    update_only: true
+
+- name: Register subscription for RHEL
+  when: ansible_os_family == 'RedHat'
+  community.general.redhat_subscription:
+    username: "{{ lookup('env', 'RHN_USERNAME') }}"
+    password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+
+- name: Enable repository management for RHEL
+  when: ansible_os_family == 'RedHat'
+  ansible.builtin.command:
+    cmd: subscription-manager config --rhsm.manage_repos=1
+  register: rhsm_manage_repos
+  changed_when: rhsm_manage_repos.rc != 0
