@@ -166,6 +166,7 @@
   ansible.builtin.command:
     cmd: bash -lc "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
   register: install_result
+  become: false
 
 - name: Check if the installation was successful
   ansible.builtin.debug:
