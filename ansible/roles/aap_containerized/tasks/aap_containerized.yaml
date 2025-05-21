@@ -7,6 +7,16 @@
 #     update_cache: true
 #     update_only: true
 
+- name: Validate required environment variables
+  ansible.builtin.fail:
+    msg: "Required environment variable {{ item }} is not set"
+  when: lookup('env', item) is not defined
+  loop:
+    - RHSM_OFFLINE_TOKEN
+    - AAP_ADMIN_PASSWORD
+    - RHN_REGISTRY_SVC
+    - RHN_REGISTRY_TOKEN
+
 - name: Register subscription for RHEL
   when: ansible_os_family == 'RedHat'
   community.general.redhat_subscription:
@@ -139,6 +149,8 @@
   ansible.builtin.set_fact:
     aap_hostname: "{{ aap_hostname | default('aap.example.org') }}"
 
+
+
 - name: Update inventory file with template
   ansible.builtin.template:
     src: inventory-growth.j2
@@ -146,9 +158,23 @@
     mode: '0644'
   vars:
     new_install_password: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
-    registry_username: "{{ lookup('env', 'RHN_REGISTRY_SVC') }}"
-    registry_auth_token: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
+    #registry_username: "{{ lookup('env', 'RHN_REGISTRY_SVC') }}"
+    #registry_auth_token: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
 
+# check if the inventory file was created
+- name: Check if inventory file exists
+  ansible.builtin.stat:
+    path: "/tmp/inventory-growth"
+  register: inventory_file
+
+# output inventory file
+- name: Debug - Show inventory file
+  ansible.builtin.shell: cat /tmp/inventory-growth
+  register: result
+  
+- name: Show file content
+  ansible.builtin.debug:
+    msg: "{{ result.stdout }}"
 
 - name: Set the system hostname for the AAP installer
   become: true
