@@ -19,3 +19,14 @@
     cmd: subscription-manager config --rhsm.manage_repos=1
   register: rhsm_manage_repos
   changed_when: rhsm_manage_repos.rc != 0
+  
+- name: Install required packages
+  ansible.builtin.dnf:
+    name:
+      - ansible-core
+      - wget
+      - git-core
+      - rsync
+      - vim
+    state: present
+  become: yes
