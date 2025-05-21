@@ -1,11 +1,11 @@
 ---
-- name: Update RHEL-based systems
-  when: ansible_os_family == 'RedHat'
-  ansible.builtin.dnf:
-    name: '*'
-    state: latest
-    update_cache: true
-    update_only: true
+# - name: Update RHEL-based systems
+#   when: ansible_os_family == 'RedHat'
+#   ansible.builtin.dnf:
+#     name: '*'
+#     state: latest
+#     update_cache: true
+#     update_only: true
 
 - name: Register subscription for RHEL
   when: ansible_os_family == 'RedHat'
