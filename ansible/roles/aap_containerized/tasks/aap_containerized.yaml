@@ -30,3 +30,20 @@
       - vim
     state: present
   become: yes
+
+- name: Download Ansible Automation Platform setup file
+  ansible.builtin.get_url:
+    url: "https://github.com/Hashi-RedHat-APJ-Collab/AAP-2.5-containerized-on-AWS/raw/refs/heads/main/post_data/ansible-automation-platform-containerized-setup-2.5-13.tar.gz"
+    dest: "/tmp/ansible-automation-platform-containerized-setup-2.5-13.tar.gz"
+  register: download_result
+
+- name: Get information about downloaded file
+  ansible.builtin.stat: 
+    path: "/tmp/ansible-automation-platform-containerized-setup-2.5-13.tar.gz"
+  register: file_info
+
+- name: Extract AAP setup archive
+  ansible.builtin.unarchive:
+    src: "/tmp/ansible-automation-platform-containerized-setup-2.5-13.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
