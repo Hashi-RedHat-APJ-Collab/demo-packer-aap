@@ -38,6 +38,7 @@ data "amazon-ami" "rhel9-ue1" {
     name                = "RHEL-9*-x86_64-*"
     root-device-type    = "ebs"
     virtualization-type = "hvm"
+    
   }
   most_recent = true
   owners      = ["309956199498"] # Red Hat
@@ -50,7 +51,17 @@ source "amazon-ebs" "rhel9" {
   source_ami     = data.amazon-ami.rhel9-ue1.id
   ssh_username   = "ec2-user"
   ssh_agent_auth = false
+
+  launch_block_device_mappings {
+    device_name           = "/dev/sda1"
+    volume_size           = 100
+    volume_type           = "gp3"
+    delete_on_termination = true
+  }
+  
 }
+
+ 
 
 build {
 #   hcp_packer_registry {
@@ -71,6 +82,18 @@ build {
   sources = [
     "source.amazon-ebs.rhel9"
   ]
+
+  provisioner "shell" {
+    inline = [
+      "echo 'Expanding root partition and filesystem...'",
+      "sleep 5",
+      "df -h",
+      #"sudo growpart /dev/sda1", # Grow partition 1 on /dev/sda
+      #"sudo xfs_growfs /",        # Resize XFS filesystem on root
+      "echo 'Disk space after resizing:'",
+      "df -h /"
+    ]
+  }
 
   provisioner "ansible" {
     playbook_file = "${path.cwd}/ansible/playbook.yml"

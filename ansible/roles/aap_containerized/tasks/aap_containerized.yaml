@@ -275,14 +275,31 @@
     msg: "URI access result for registry.redhat.io: {{ uri_result }}"
 
 - block:
-  - name: "Run AAP installer playbook"
+  - name: "Run AAP installer (async)"
     ansible.builtin.shell: |
-      cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
-      ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
+      sudo -iu aap bash -l -c "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install 2>&1 | tee /tmp/aap-install.log"
+    async: 3600
+    poll: 0
+    register: install_job
+
+  - name: "Monitor installation progress"
+    ansible.builtin.shell: tail -n 20 /tmp/aap-install.log
+    register: log_output
+    until: install_job.finished
+    delay: 30
+    retries: 120
+    ignore_errors: true
+
+  - name: "Check installation status"
+    async_status:
+      jid: "{{ install_job.ansible_job_id }}"
     register: install_result
-  become_user: aap
-  become_method: sudo
-  become: true
+
+# - block:
+#   - name: "Run AAP installer"
+#     ansible.builtin.shell: |
+#       sudo -iu aap bash -l -c "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
+#     register: install_result
   
 - name: Check if the installation was successful
   ansible.builtin.debug:
