@@ -227,7 +227,8 @@
 
 - name: Run AAP installer playbook
   ansible.builtin.command:
-    cmd: bash -lc "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_BECOME_PASS='{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}' ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
+    cmd: bash -lc "su - aap; cd /tmp/ansible-automation-platform-containerized-setup-2.5-13; ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_BECOME_PASS='{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}' ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
+  become_user: aap
   register: install_result
 
 - name: Check if the installation was successful
