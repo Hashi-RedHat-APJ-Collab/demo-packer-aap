@@ -16,6 +16,9 @@
     - AAP_ADMIN_PASSWORD
     - RHN_REGISTRY_SVC
     - RHN_REGISTRY_TOKEN
+    - RHSM_ALLOCATION_UUID
+    - RHN_USERNAME
+    - RHN_PASSWORD
 
  # create aap user  adduser aap
 - name: Create AAP user
