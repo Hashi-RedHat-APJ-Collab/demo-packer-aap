@@ -50,6 +50,8 @@ source "amazon-ebs" "rhel9" {
   source_ami     = data.amazon-ami.rhel9-ue1.id
   ssh_username   = "ec2-user"
   ssh_agent_auth = false
+  #dont terminate on error
+  delete_on_termination = false
 }
 
 build {

@@ -27,15 +27,14 @@
 # Ansible
 ansible_connection=local
 
-#ee_minimal_image=registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9:latest
-#ee_supported_image=registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9:latest
-#de_supported_image=registry.redhat.io/ansible-automation-platform-25/de-supported-rhel9:latest
+ee_minimal_image=ee-minimal-rhel9:latest
+ee_supported_image=ee-supported-rhel9:latest
+de_supported_image=de-supported-rhel9:latest
 
 # Common variables
 postgresql_admin_username=postgres
 postgresql_admin_password={{ new_install_password }}
 
-registry_url=registry.redhat.io
 registry_username="17328762|aap-testing"
 registry_password={{ registry_password }}
 

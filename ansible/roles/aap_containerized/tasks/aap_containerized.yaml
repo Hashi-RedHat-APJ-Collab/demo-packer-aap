@@ -12,13 +12,13 @@
     msg: "Required environment variable {{ item }} is not set or is empty"
   when: (lookup('env', item) | default('')) | length == 0
   loop:
-    - RHSM_OFFLINE_TOKEN
     - AAP_ADMIN_PASSWORD
     - RHN_REGISTRY_SVC
     - RHN_REGISTRY_TOKEN
-    - RHSM_ALLOCATION_UUID
     - RHN_USERNAME
     - RHN_PASSWORD
+    - RHSM_OFFLINE_TOKEN
+    - RHSM_ALLOCATION_UUID
 
  # create aap user  adduser aap
 - name: Create AAP user
@@ -40,6 +40,14 @@
     append: true
   become: true
 
+- name: Configure passwordless sudo for aap user
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/aap-access
+    line: "aap ALL=(ALL) NOPASSWD: ALL"
+    create: yes
+    mode: '0440'
+    validate: 'visudo -cf %s'
+  become: yes
 
 - name: Register subscription for RHEL
   when: ansible_os_family == 'RedHat'
@@ -224,12 +232,23 @@
   ansible.builtin.debug:
     msg: "URI access result for registry.redhat.io: {{ uri_result }}"
 
-
 - name: Run AAP installer playbook
-  ansible.builtin.command:
-    cmd: bash -lc "su - aap; cd /tmp/ansible-automation-platform-containerized-setup-2.5-13; ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_BECOME_PASS='{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}' ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
-  become_user: aap
+  ansible.builtin.shell:
+    cmd: |
+      sudo loginctl enable-linger aap
+      cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
+      sudo -u aap ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
+  become: true
+  environment:
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+    ANSIBLE_BECOME_PASS: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
   register: install_result
+
+# - name: Run AAP installer playbook
+#   ansible.builtin.command:
+#     cmd: sudo -u aap bash -lc "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13; ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_BECOME_PASS='{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}' ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
+#   become_user: aap
+#   register: install_result
 
 - name: Check if the installation was successful
   ansible.builtin.debug:
