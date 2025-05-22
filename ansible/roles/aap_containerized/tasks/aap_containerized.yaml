@@ -281,8 +281,8 @@
   poll: 0
   register: install_job
 
-# Check progress without displaying logs
-- name: "Check AAP installation progress"
+# This task will poll the async job status until it's finished
+- name: "Wait for AAP installation to complete"
   ansible.builtin.async_status:
     jid: "{{ install_job.ansible_job_id }}"
   register: job_result
@@ -290,22 +290,28 @@
   delay: 30
   retries: 120
 
-# Get and display logs in a single combined task to ensure output is shown
-- name: "Show installation log progress"
-  block:
-    - name: "Tail installation log"
-      ansible.builtin.shell: "tail -n 20 /tmp/aap-install.log || echo 'Log file not yet available'"
-      register: log_tail
-      changed_when: false
-      failed_when: false
-    
-    - name: "Display log output"
-      ansible.builtin.debug:
-        msg: "{{ log_tail.stdout_lines }}"
-  register: log_display
-  until: job_result.finished
-  delay: 30
-  retries: 120
+# Task to display log 10 times during installation
+- name: "Display installation log snapshots during installation"
+  ansible.builtin.shell: "tail -n 20 /tmp/aap-install.log || echo 'Log file not yet available'"
+  register: log_tail
+  loop: "{{ range(0, 10)|list }}"  # Show log 10 times
+  loop_control:
+    index_var: log_check_index
+    pause: 30  # Pause 30 seconds between each check
+  changed_when: false
+  failed_when: false
+  when: not ansible_check_mode
+  
+- name: "Display log contents from each check"
+  ansible.builtin.debug:
+    msg: "{{ log_tail.results[log_check_index].stdout_lines }}"
+  loop: "{{ range(0, 10)|list }}"
+  loop_control:
+    index_var: log_check_index
+  when: 
+    - not ansible_check_mode
+    - log_tail.results is defined
+    - log_check_index < log_tail.results|length
 
 - name: "Display Final Installation Result"
   ansible.builtin.debug:
