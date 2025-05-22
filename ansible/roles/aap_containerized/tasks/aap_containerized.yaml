@@ -48,6 +48,12 @@
     append: true
   become: true
 
+- name: Enable lingering for aap user
+  ansible.builtin.command:
+    cmd: "loginctl enable-linger aap"
+  become: true
+  when: aap_user.uid is defined
+
 - name: Configure passwordless sudo for aap user
   ansible.builtin.lineinfile:
     path: /etc/sudoers.d/aap-access
@@ -77,9 +83,9 @@
       cmd: "podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password \"{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}\""
   - name: Validate pull image
     ansible.builtin.shell: |
-      loginctl enable-linger 1001
       podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9:latest
       podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel8:latest
+      podman pull registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9:latest
       podman pull registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel8:latest
     register: podman_pull_result
     changed_when: podman_pull_result.rc == 0
@@ -271,10 +277,8 @@
 - block:
   - name: "Run AAP installer playbook"
     ansible.builtin.shell: |
-      loginctl enable-linger aap
-      loginctl enable-linger 1001
       cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
-      ansible-playbook -v -i /tmp/inventory-growth ansible.containerized_installer.install
+      ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
     register: install_result
   become_user: aap
   become_method: sudo
