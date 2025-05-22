@@ -1,11 +1,18 @@
 ---
-# - name: Update RHEL-based systems
-#   when: ansible_os_family == 'RedHat'
-#   ansible.builtin.dnf:
-#     name: '*'
-#     state: latest
-#     update_cache: true
-#     update_only: true
+- name: Register subscription for RHEL
+  when: ansible_os_family == 'RedHat'
+  community.general.redhat_subscription:
+    username: "{{ lookup('env', 'RHN_USERNAME') }}"
+    password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+
+
+- name: Update RHEL-based systems
+  when: ansible_os_family == 'RedHat'
+  ansible.builtin.dnf:
+    name: '*'
+    state: latest
+    update_cache: true
+    update_only: true
 
 - name: Validate required environment variables
   ansible.builtin.fail:
@@ -67,11 +74,6 @@
     var: podman_login_result
     verbosity: 1
 
-- name: Register subscription for RHEL
-  when: ansible_os_family == 'RedHat'
-  community.general.redhat_subscription:
-    username: "{{ lookup('env', 'RHN_USERNAME') }}"
-    password: "{{ lookup('env', 'RHN_PASSWORD') }}"
 
 - name: Enable repository management for RHEL
   when: ansible_os_family == 'RedHat'
