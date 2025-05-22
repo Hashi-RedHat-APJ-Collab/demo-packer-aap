@@ -87,16 +87,23 @@
 #     var: podman_login_result
 
 # test image pull podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9
-- name: Pull Ansible Automation Platform image
-  ansible.builtin.command:
-    cmd: |
-      sudo -iu aap
-      podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password \"{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}\""
-      loginctl enable-linger 1001
-      podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9
+
+# ansible runas block
+
+- block:
+  - name: "Login to Red Hat Registry"
+    ansible.builtin.command:
+      cmd: "podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password \"{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}\""
+  - name: Validate pull image
+    ansible.builtin.shell: 
+      cmd: podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9
+    register: podman_pull_result
+    changed_when: podman_pull_result.rc == 0
+  become_user: aap
+  become_method: sudo
   become: true
-  register: podman_pull_result
-  changed_when: podman_pull_result.rc == 0
+  
+  
 
 
 - name: Debug Podman Pull
@@ -280,20 +287,16 @@
   ansible.builtin.debug:
     msg: "URI access result for registry.redhat.io: {{ uri_result }}"
 
-
-- name: Run AAP installer playbook
-  ansible.builtin.shell:
-    cmd: |
-      sudo -iu aap
-      loginctl enable-linger 1001
-      loginctl enable-linger aap
-      cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
-      ansible-playbook -v -i /tmp/inventory-growth ansible.containerized_installer.install
+- block:
+  - name: "Run AAP installer playbook"
+    ansible.builtin.shell: |
+     loginctl enable-linger aap
+     cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
+     ansible-playbook -v -i /tmp/inventory-growth ansible.containerized_installer.install
+  become_user: aap
+  become_method: sudo
   become: true
-  environment:
-    ANSIBLE_HOST_KEY_CHECKING: "False"
-    ANSIBLE_BECOME_PASS: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
-  register: install_result
+
 
 # - name: Run AAP installer playbook
 #   ansible.builtin.command:
