@@ -41,6 +41,7 @@
   become: true
   register: aap_user
 
+
 # add aap user to sudoers but don't make root
 - name: Add AAP user to wheel group
   ansible.builtin.user:
@@ -58,13 +59,19 @@
     validate: 'visudo -cf %s'
   become: true
 
-# install podman
 - name: Install Podman
   ansible.builtin.dnf:
-    name: podman
+    name: container-tools
     state: present
   become: true
   register: podman_install
+
+- name: Install Podman
+  ansible.builtin.dnf:
+    name: podman-docker
+    state: present
+  become: true
+  register: podman_docker
 
 - name: Validate login to Red Hat Registry
   ansible.builtin.command:
@@ -79,7 +86,6 @@
 - name: Debug Podman Login
   ansible.builtin.debug:
     var: podman_login_result
-    verbosity: 1
 
 
 - name: Enable repository management for RHEL
