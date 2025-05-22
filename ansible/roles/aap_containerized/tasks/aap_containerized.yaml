@@ -274,34 +274,44 @@
   ansible.builtin.debug:
     msg: "URI access result for registry.redhat.io: {{ uri_result }}"
 
-- block:
-  - name: "Run AAP installer (async)"
-    ansible.builtin.shell: |
-      sudo -iu aap bash -l -c "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install 2>&1 | tee /tmp/aap-install.log"
-    async: 3600
-    poll: 0
-    register: install_job
+- name: "Run AAP installer (async)"
+  ansible.builtin.shell: |
+    sudo -iu aap bash -l -c "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install 2>&1 | tee /tmp/aap-install.log"
+  async: 3600
+  poll: 0
+  register: install_job
 
-  - name: "Monitor installation progress"
-    ansible.builtin.shell: "tail -n 20 /tmp/aap-install.log || echo 'Log file /tmp/aap-install.log not yet available or empty.'"
-    register: log_output
-    changed_when: false
-    until: install_job.finished
-    delay: 30
-    retries: 120
-    ignore_errors: true
+# Check progress without displaying logs
+- name: "Check AAP installation progress"
+  ansible.builtin.async_status:
+    jid: "{{ install_job.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  delay: 30
+  retries: 120
 
-  - name: "Check installation status"
-    ansible.builtin.async_status:
-      jid: "{{ install_job.ansible_job_id }}"
-    register: install_result
+# Get and display logs in a single combined task to ensure output is shown
+- name: "Show installation log progress"
+  block:
+    - name: "Tail installation log"
+      ansible.builtin.shell: "tail -n 20 /tmp/aap-install.log || echo 'Log file not yet available'"
+      register: log_tail
+      changed_when: false
+      failed_when: false
+    
+    - name: "Display log output"
+      ansible.builtin.debug:
+        msg: "{{ log_tail.stdout_lines }}"
+  register: log_display
+  until: job_result.finished
+  delay: 30
+  retries: 120
 
-# - block:
-#   - name: "Run AAP installer"
-#     ansible.builtin.shell: |
-#       sudo -iu aap bash -l -c "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
-#     register: install_result
-  
-- name: Check if the installation was successful
+- name: "Display Final Installation Result"
   ansible.builtin.debug:
-    msg: "{{ install_result }}"
+    var: job_result
+
+- name: "Fail playbook if installation did not complete successfully"
+  ansible.builtin.fail:
+    msg: "AAP installation did not complete successfully. Final status: {{ job_result }}"
+  when: not job_result.finished or job_result.failed
