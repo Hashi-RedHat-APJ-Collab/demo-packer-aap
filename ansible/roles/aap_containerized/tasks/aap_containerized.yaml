@@ -274,35 +274,33 @@
   ansible.builtin.debug:
     msg: "URI access result for registry.redhat.io: {{ uri_result }}"
 
-- name: "Run AAP installer (async)"
+- name: "Run AAP installer"
   ansible.builtin.shell: |
-    sudo -iu aap bash -l -c "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install 2>&1 | tee /tmp/aap-install.log"
-  async: 3600
-  poll: 0
-  register: install_job
+    sudo -iu aap bash -l -c "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
+  register: install_result
 
-# Monitor installation in background
-- name: "Wait for AAP installation to complete (in background)"
-  ansible.builtin.async_status:
-    jid: "{{ install_job.ansible_job_id }}"
-  register: job_result
-  until: job_result.finished
-  delay: 30
-  retries: 120
+# # Monitor installation in background
+# - name: "Wait for AAP installation to complete (in background)"
+#   ansible.builtin.async_status:
+#     jid: "{{ install_job.ansible_job_id }}"
+#   register: job_result
+#   until: job_result.finished
+#   delay: 30
+#   retries: 120
 
-# Display logs periodically (10 times, every 30 seconds)
-- name: "Display installation logs periodically"
-  ansible.builtin.include_tasks: display_log.yaml
-  loop: "{{ range(1, 11)|list }}"  # 10 iterations
-  loop_control:
-    loop_var: log_check_number
-    pause: 30  # 30 second pause between iterations
+# # Display logs periodically (10 times, every 30 seconds)
+# - name: "Display installation logs periodically"
+#   ansible.builtin.include_tasks: display_log.yaml
+#   loop: "{{ range(1, 11)|list }}"  # 10 iterations
+#   loop_control:
+#     loop_var: log_check_number
+#     pause: 30  # 30 second pause between iterations
 
 - name: "Display Final Installation Result"
   ansible.builtin.debug:
-    var: job_result
+    var: install_result
 
-- name: "Fail playbook if installation did not complete successfully"
-  ansible.builtin.fail:
-    msg: "AAP installation did not complete successfully. Final status: {{ job_result }}"
-  when: not job_result.finished or job_result.failed
+# - name: "Fail playbook if installation did not complete successfully"
+#   ansible.builtin.fail:
+#     msg: "AAP installation did not complete successfully. Final status: {{ job_result }}"
+#   when: not job_result.finished or job_result.failed

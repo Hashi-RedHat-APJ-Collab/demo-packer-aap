@@ -59,6 +59,7 @@ source "amazon-ebs" "rhel9" {
     delete_on_termination = true
   }
   
+  ssh_timeout         = "60m"
 }
 
  
@@ -105,6 +106,8 @@ build {
       "CONTROLLER_USERNAME=${var.controller_username}",
       "CONTROLLER_PASSWORD=${var.controller_password}"
     ]
+    
+    timeout = "1h"
   }
 
 }
