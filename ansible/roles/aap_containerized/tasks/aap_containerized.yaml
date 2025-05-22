@@ -87,6 +87,14 @@
   ansible.builtin.debug:
     var: podman_login_result
 
+# test image pull podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9
+- name: Pull Ansible Automation Platform image
+  ansible.builtin.command:
+    cmd: "podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9"
+  become: true
+  become_user: aap 
+  register: podman_pull_result
+  changed_when: podman_pull_result.rc == 0
 
 - name: Enable repository management for RHEL
   when: ansible_os_family == 'RedHat'
@@ -269,6 +277,7 @@
 - name: Run AAP installer playbook
   ansible.builtin.shell:
     cmd: |
+      sudo loginctl enable-linger 1001
       sudo loginctl enable-linger aap
       cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
       sudo -u aap ansible-playbook -vvvv -i /tmp/inventory-growth ansible.containerized_installer.install
