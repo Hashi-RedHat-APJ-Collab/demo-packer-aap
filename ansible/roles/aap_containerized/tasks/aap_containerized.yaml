@@ -265,44 +265,6 @@
   ansible.builtin.debug:
     msg: "URI access result for registry.redhat.io: {{ uri_result }}"
 
-- name: Log in to Red Hat Registry
-  ansible.builtin.command:
-    cmd: "podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password-stdin"
-    stdin: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
-  become: true
-  become_user: aap
-  no_log: true
-  register: podman_login_result
-  changed_when: podman_login_result.rc == 0
-  failed_when: podman_login_result.rc != 0 and "already logged in" not in podman_login_result.stderr and "Login Succeeded!" not in podman_login_result.stdout
-
-- name: Debug Podman Login
-  ansible.builtin.debug:
-    var: podman_login_result
-    verbosity: 1
-
-- name: Check DNS resolution for registry.redhat.io
-  ansible.builtin.command: "nslookup registry.redhat.io"
-  register: dns_check
-  changed_when: false
-  become: true # nslookup might require root if /etc/resolv.conf is restricted
-
-- name: Debug DNS Check
-  ansible.builtin.debug:
-    var: dns_check.stdout_lines
-
-- name: Check connectivity to registry.redhat.io port 443
-  ansible.builtin.wait_for:
-    host: registry.redhat.io
-    port: 443
-    timeout: 10
-    msg: "Cannot connect to registry.redhat.io:443"
-  register: port_check
-  ignore_errors: true
-
-- name: Debug Port Check
-  ansible.builtin.debug:
-    var: port_check
 
 - name: Run AAP installer playbook
   ansible.builtin.shell:
