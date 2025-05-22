@@ -85,12 +85,8 @@ build {
 
   provisioner "shell" {
     inline = [
-      "echo 'Expanding root partition and filesystem...'",
       "sleep 5",
       "df -h",
-      #"sudo growpart /dev/sda1", # Grow partition 1 on /dev/sda
-      #"sudo xfs_growfs /",        # Resize XFS filesystem on root
-      "echo 'Disk space after resizing:'",
       "df -h /"
     ]
   }

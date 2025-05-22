@@ -283,15 +283,16 @@
     register: install_job
 
   - name: "Monitor installation progress"
-    ansible.builtin.shell: tail -n 20 /tmp/aap-install.log
+    ansible.builtin.shell: "tail -n 20 /tmp/aap-install.log || echo 'Log file /tmp/aap-install.log not yet available or empty.'"
     register: log_output
+    changed_when: false
     until: install_job.finished
     delay: 30
     retries: 120
     ignore_errors: true
 
   - name: "Check installation status"
-    async_status:
+    ansible.builtin.async_status:
       jid: "{{ install_job.ansible_job_id }}"
     register: install_result
 
