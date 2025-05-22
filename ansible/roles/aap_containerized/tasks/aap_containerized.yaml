@@ -58,6 +58,14 @@
     validate: 'visudo -cf %s'
   become: true
 
+# install podman
+- name: Install Podman
+  ansible.builtin.dnf:
+    name: podman
+    state: present
+  become: true
+  register: podman_install
+
 - name: Validate login to Red Hat Registry
   ansible.builtin.command:
     cmd: "podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password \"{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}\""
