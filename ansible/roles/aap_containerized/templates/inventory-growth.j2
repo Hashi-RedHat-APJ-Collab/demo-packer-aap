@@ -27,10 +27,6 @@
 # Ansible
 ansible_connection=local
 
-ee_minimal_image=ee-minimal-rhel9:latest
-ee_supported_image=ee-supported-rhel9:latest
-de_supported_image=de-supported-rhel9:latest
-
 # Common variables
 postgresql_admin_username=postgres
 postgresql_admin_password={{ new_install_password }}
@@ -49,11 +45,13 @@ gateway_pg_password={{ new_install_password }}
 controller_admin_password={{ new_install_password }}
 controller_pg_host={{ aap_hostname }}
 controller_pg_password={{ new_install_password }}
+controller_percent_memory_capacity=0.5
 
 # AAP Automation Hub
 hub_admin_password={{ new_install_password }}
 hub_pg_host={{ aap_hostname }}
 hub_pg_password={{ new_install_password }}
+hub_seed_collections=false
 
 # AAP EDA Controller
 eda_admin_password={{ new_install_password }}

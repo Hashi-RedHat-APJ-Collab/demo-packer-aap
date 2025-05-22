@@ -237,8 +237,9 @@
     cmd: |
       sudo loginctl enable-linger aap
       cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
-      sudo -u aap ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
+      sudo -u aap ansible-playbook -vvvv -i /tmp/inventory-growth ansible.containerized_installer.install
   become: true
+  become_user: ec2-user
   environment:
     ANSIBLE_HOST_KEY_CHECKING: "False"
     ANSIBLE_BECOME_PASS: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
