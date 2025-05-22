@@ -77,7 +77,6 @@
   ansible.builtin.command:
     cmd: "podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password \"{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}\""
   become: true
-  become_user: ec2-user # Or whichever user runs podman
   no_log: false # To avoid logging the token
   register: podman_login_result
   changed_when: podman_login_result.rc == 0
@@ -90,9 +89,8 @@
 # test image pull podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9
 - name: Pull Ansible Automation Platform image
   ansible.builtin.command:
-    cmd: "sudo -iu aap podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9"
+    cmd: "loginctl enable-linger 1001; sudo -iu aap podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9"
   become: true
-  become_user: ec2-user # Or whichever user runs podman 
   register: podman_pull_result
   changed_when: podman_pull_result.rc == 0
 
@@ -287,7 +285,6 @@
       cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
       sudo -iu aap ansible-playbook -v -i /tmp/inventory-growth ansible.containerized_installer.install
   become: true
-  become_user: ec2-user
   environment:
     ANSIBLE_HOST_KEY_CHECKING: "False"
     ANSIBLE_BECOME_PASS: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
