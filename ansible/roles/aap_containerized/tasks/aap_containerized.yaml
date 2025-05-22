@@ -290,13 +290,17 @@
 - block:
   - name: "Run AAP installer playbook"
     ansible.builtin.shell: |
-     loginctl enable-linger aap
-     cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
-     ansible-playbook -v -i /tmp/inventory-growth ansible.containerized_installer.install
+      loginctl enable-linger aap
+      cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
+      ansible-playbook -v -i /tmp/inventory-growth ansible.containerized_installer.install
+    register: install_result
   become_user: aap
   become_method: sudo
   become: true
-
+  
+- name: Check if the installation was successful
+  ansible.builtin.debug:
+    msg: "{{ install_result }}"
 
 # - name: Run AAP installer playbook
 #   ansible.builtin.command:
@@ -304,6 +308,3 @@
 #   become_user: aap
 #   register: install_result
 
-- name: Check if the installation was successful
-  ansible.builtin.debug:
-    msg: "{{ install_result }}"
