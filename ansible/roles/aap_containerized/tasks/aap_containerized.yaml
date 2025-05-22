@@ -27,8 +27,6 @@
     - RHSM_OFFLINE_TOKEN
     - RHSM_ALLOCATION_UUID
 
-
-
  # create aap user  adduser aap
 - name: Create AAP user
   ansible.builtin.user:
@@ -73,39 +71,22 @@
   become: true
   register: podman_docker
 
-# - name: Validate login to Red Hat Registry
-#   ansible.builtin.command:
-#     cmd: "podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password \"{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}\""
-#   become: true
-#   no_log: false # To avoid logging the token
-#   register: podman_login_result
-#   changed_when: podman_login_result.rc == 0
-#   failed_when: podman_login_result.rc != 0 and "already logged in" not in podman_login_result.stderr # Don't fail if already logged in
-
-# - name: Debug Podman Login
-#   ansible.builtin.debug:
-#     var: podman_login_result
-
-# test image pull podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9
-
-# ansible runas block
-
 - block:
   - name: "Login to Red Hat Registry"
     ansible.builtin.command:
       cmd: "podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password \"{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}\""
   - name: Validate pull image
-    ansible.builtin.shell: 
-      cmd: podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9
+    ansible.builtin.shell: |
+      loginctl enable-linger 1001
+      podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9:latest
+      podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel8:latest
+      podman pull registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel8:latest
     register: podman_pull_result
     changed_when: podman_pull_result.rc == 0
   become_user: aap
   become_method: sudo
   become: true
   
-  
-
-
 - name: Debug Podman Pull
   ansible.builtin.debug:
     var: podman_pull_result
@@ -291,6 +272,7 @@
   - name: "Run AAP installer playbook"
     ansible.builtin.shell: |
       loginctl enable-linger aap
+      loginctl enable-linger 1001
       cd /tmp/ansible-automation-platform-containerized-setup-2.5-13
       ansible-playbook -v -i /tmp/inventory-growth ansible.containerized_installer.install
     register: install_result
@@ -301,10 +283,3 @@
 - name: Check if the installation was successful
   ansible.builtin.debug:
     msg: "{{ install_result }}"
-
-# - name: Run AAP installer playbook
-#   ansible.builtin.command:
-#     cmd: sudo -u aap bash -lc "cd /tmp/ansible-automation-platform-containerized-setup-2.5-13; ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_BECOME_PASS='{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}' ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install"
-#   become_user: aap
-#   register: install_result
-
