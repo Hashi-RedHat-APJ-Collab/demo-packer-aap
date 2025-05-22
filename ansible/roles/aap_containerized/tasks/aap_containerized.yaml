@@ -58,10 +58,9 @@
     validate: 'visudo -cf %s'
   become: true
 
-- name: Log in to Red Hat Registry
+- name: Validate login to Red Hat Registry
   ansible.builtin.command:
-    cmd: "podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password-stdin"
-    stdin: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
+    cmd: "podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password \"{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}\""
   become: true
   become_user: aap # Or whichever user runs podman
   no_log: false # To avoid logging the token
