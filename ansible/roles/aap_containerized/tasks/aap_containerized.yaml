@@ -232,6 +232,7 @@
     new_install_password: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
     ansible_become_pass: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
     registry_password: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
+    offline_token: "{{ lookup('env', 'RHSM_OFFLINE_TOKEN') }}"
 
 # check if the inventory file was created
 - name: Check if inventory file exists
@@ -308,6 +309,6 @@
   register: install_result
   become_user: aap
 
-# - name: "Display Final Installation Result"
-#   ansible.builtin.debug:
-#     var: install_result
+- name: "Display Final Installation Result"
+  ansible.builtin.debug:
+    var: install_result
