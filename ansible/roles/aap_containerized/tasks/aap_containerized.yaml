@@ -274,14 +274,14 @@
   ansible.builtin.debug:
     msg: "URI access result for registry.redhat.io: {{ uri_result }}"
 
-
-#sudo chmod 1777 /tmp
-- name: Set permissions for /tmp
+# create directory as aap user /tmp/ansible-automation-platform-containerized-setup-2.5-13/collections/ansible_collections/ansible/containerized_installer/playbooks/config_as_code
+- name: Create directory for config_as_code
   ansible.builtin.file:
-    path: /tmp/ansible-automation-platform-containerized-setup-2.5-13
-    mode: '1777'
+    path: /tmp/ansible-automation-platform-containerized-setup-2.5-13/collections/ansible_collections/ansible/containerized_installer/playbooks/config_as_code
+    state: directory
     owner: aap
-    recurse: true
+    group: aap
+    mode: '0755'
   become: true
 
 - name: "Run AAP installer"
