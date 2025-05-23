@@ -274,6 +274,15 @@
   ansible.builtin.debug:
     msg: "URI access result for registry.redhat.io: {{ uri_result }}"
 
+
+#sudo chmod 1777 /tmp
+- name: Set permissions for /tmp
+  ansible.builtin.file:
+    path: /tmp/ansible-automation-platform-containerized-setup-2.5-13
+    mode: '1777'
+    recurse: true
+  become: true
+
 - name: "Run AAP installer"
   ansible.builtin.shell: |
     cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
