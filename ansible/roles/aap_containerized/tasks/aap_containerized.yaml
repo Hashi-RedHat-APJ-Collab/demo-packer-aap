@@ -280,6 +280,7 @@
   ansible.builtin.file:
     path: /tmp/ansible-automation-platform-containerized-setup-2.5-13
     mode: '1777'
+    owner: aap
     recurse: true
   become: true
 
