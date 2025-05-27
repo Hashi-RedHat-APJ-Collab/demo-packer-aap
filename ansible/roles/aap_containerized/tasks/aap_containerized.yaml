@@ -185,7 +185,7 @@
 
 - name: Download Ansible Automation Platform setup file
   ansible.builtin.get_url:
-    url: "https://github.com/Hashi-RedHat-APJ-Collab/AAP-2.5-containerized-on-AWS/raw/refs/heads/main/post_data/ansible-automation-platform-containerized-setup-2.5-13.tar.gz"
+    url: "https://github.com/Hashi-RedHat-APJ-Collab/demo-packer-aap/raw/refs/heads/main/ansible-automation-platform-containerized-setup-2.5-13.tar.gz"
     dest: /tmp/ansible-automation-platform-containerized-setup-2.5-13.tar.gz
   register: download_result
 
