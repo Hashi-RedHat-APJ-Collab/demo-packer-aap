@@ -157,7 +157,7 @@
   register: poll_result
   until: poll_result.status == 200
   retries: 15
-  delay: 5
+  delay: 10
   changed_when: false
 
 - name: Debug - Show poll result
