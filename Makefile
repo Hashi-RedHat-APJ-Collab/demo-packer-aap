@@ -3,6 +3,7 @@ rhel_9_base:
 	packer build -var-file variables/base_rhel.pkrvars.hcl -var-file variables/common.pkrvars.hcl builds/linux/rhel/9
 
 aap_demo:
+	@set -a && source .env.local && set +a && \
 	packer init -var-file variables/rhel_9_aap_demo.pkrvars.hcl builds/linux/rhel/9
 	packer build -var-file variables/rhel_9_aap_demo.pkrvars.hcl -var-file variables/common.pkrvars.hcl builds/linux/rhel/9
 
