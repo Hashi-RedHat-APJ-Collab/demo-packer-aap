@@ -10,9 +10,8 @@ Instead, create a `.env.local` file in the project root with the following:
 
 ```ini
 # .env.local
-GALAXY_OFFLINE_TOKEN=your-access-token-here # e.g. "ey...."
+HUB_OFFLINE_TOKEN=your-access-token-here # e.g. "ey...."
 ```
 
-This file is automatically loaded by the Makefile when running targets like make aap_demo. The environment variable REDHAT_AAP_TOKEN is injected into the Ansible runtime so it can authenticate to the hub securely.
-
+This file is automatically loaded by the Makefile when running targets like make aap_demo. 
 🔒 Make sure .env.local is listed in .gitignore to avoid committing sensitive credentials.
