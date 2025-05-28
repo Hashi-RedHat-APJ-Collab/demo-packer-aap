@@ -145,6 +145,9 @@
       Authorization: "Bearer {{ rhsm_token.json.access_token }}"
       Accept: "application/json"
     status_code: 200
+  retries: 3
+  until: manifest_download_id.status == 200
+  delay: 5
   register: manifest_download_id
 
 - name: Debug - Show manifest download result
