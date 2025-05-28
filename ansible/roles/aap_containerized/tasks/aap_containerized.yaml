@@ -238,7 +238,7 @@
 
 - name: Set AAP hostname
   ansible.builtin.set_fact:
-    aap_hostname: "{{ aap_hostname | default('aap.example.org') }}"
+    aap_hostname: "{{ aap_hostname | default('aap.demo.local') }}"
 
 - name: Update inventory file with template
   ansible.builtin.template:
@@ -247,10 +247,10 @@
     mode: '0644'
   vars:
     new_install_password: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
-    ansible_become_pass: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
     registry_username: "{{ lookup('env', 'RHN_REGISTRY_SVC') }}"
     registry_password: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
     offline_token: "{{ lookup('env', 'HUB_OFFLINE_TOKEN') }}"
+    aap_hostname: "{{ aap_hostname }}"
 
 # check if the inventory file was created
 - name: Check if inventory file exists
