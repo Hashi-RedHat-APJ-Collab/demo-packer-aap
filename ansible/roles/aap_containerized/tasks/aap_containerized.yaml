@@ -146,7 +146,7 @@
     status_code: 200
   retries: 3
   until: manifest_download_id.status == 200
-  delay: 15
+  delay: 30
   register: manifest_download_id
 
 - name: Debug - Show manifest download result
@@ -164,7 +164,7 @@
   register: poll_result
   until: poll_result.status == 200
   retries: 15
-  delay: 15
+  delay: 20
   changed_when: false
 
 - name: Debug - Show poll result
@@ -177,7 +177,7 @@
 
 - name: Sleep to prevent rate limiting
   ansible.builtin.pause:
-    seconds: 2
+    seconds: 5
 
 - name: Download manifest file
   ansible.builtin.uri:
@@ -189,6 +189,8 @@
     dest: "/tmp/manifest_AAP_Demo.zip"
     force: true
   register: manifest_file
+  retries: 10
+  delay: 61
 
 - name: Debug - Show manifest file download result
   ansible.builtin.debug:
