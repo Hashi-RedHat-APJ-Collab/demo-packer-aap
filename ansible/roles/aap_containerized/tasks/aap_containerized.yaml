@@ -146,7 +146,7 @@
     status_code: 200
   retries: 3
   until: manifest_download_id.status == 200
-  delay: 10
+  delay: 15
   register: manifest_download_id
 
 - name: Debug - Show manifest download result
@@ -164,7 +164,7 @@
   register: poll_result
   until: poll_result.status == 200
   retries: 15
-  delay: 10
+  delay: 15
   changed_when: false
 
 - name: Debug - Show poll result
