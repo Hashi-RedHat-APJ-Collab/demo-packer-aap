@@ -18,4 +18,5 @@ crash.log
 # Exclude the Packer build local variable
 .env.local
 
+*ansible.cfg
 ansible.cfg
