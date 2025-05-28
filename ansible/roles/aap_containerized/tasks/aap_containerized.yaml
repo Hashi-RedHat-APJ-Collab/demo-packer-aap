@@ -132,10 +132,9 @@
   register: rhsm_token
   no_log: false
 
-# sleep for 3 seocnds to prevent rate limiting
 - name: Sleep to prevent rate limiting
   ansible.builtin.pause:
-    seconds: 3
+    seconds: 5
 
 - name: Request manifest export
   ansible.builtin.uri:
@@ -147,7 +146,7 @@
     status_code: 200
   retries: 3
   until: manifest_download_id.status == 200
-  delay: 5
+  delay: 10
   register: manifest_download_id
 
 - name: Debug - Show manifest download result
@@ -175,6 +174,10 @@
 - name: Check manifest export status
   ansible.builtin.debug:
     msg: "Manifest export status: {{ poll_result.json }}"
+
+- name: Sleep to prevent rate limiting
+  ansible.builtin.pause:
+    seconds: 2
 
 - name: Download manifest file
   ansible.builtin.uri:
