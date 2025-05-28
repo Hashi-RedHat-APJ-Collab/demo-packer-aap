@@ -132,6 +132,11 @@
   register: rhsm_token
   no_log: false
 
+# sleep for 3 seocnds to prevent rate limiting
+- name: Sleep to prevent rate limiting
+  ansible.builtin.pause:
+    seconds: 3
+
 - name: Request manifest export
   ansible.builtin.uri:
     url: "https://api.access.redhat.com/management/v1/allocations/{{ lookup('env', 'RHSM_ALLOCATION_UUID') }}/export"
