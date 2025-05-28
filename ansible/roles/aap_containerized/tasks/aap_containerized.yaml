@@ -202,13 +202,13 @@
 
 - name: Download Ansible Automation Platform setup file
   ansible.builtin.get_url:
-    url: "https://github.com/Hashi-RedHat-APJ-Collab/demo-packer-aap/raw/refs/heads/main/ansible-automation-platform-containerized-setup-2.5-13.tar.gz"
-    dest: /tmp/ansible-automation-platform-containerized-setup-2.5-13.tar.gz
+    url: "https://github.com/Hashi-RedHat-APJ-Collab/demo-packer-aap/raw/refs/heads/main/ansible-automation-platform-containerized-setup-2.5-14.tar.gz"
+    dest: /tmp/ansible-automation-platform-containerized-setup-2.5-14.tar.gz
   register: download_result
 
 - name: Get information about downloaded file
   ansible.builtin.stat: 
-    path: "/tmp/ansible-automation-platform-containerized-setup-2.5-13.tar.gz"
+    path: "/tmp/ansible-automation-platform-containerized-setup-2.5-14.tar.gz"
   register: file_info
 
 - name: Debug - Show file info
@@ -217,7 +217,7 @@
 
 - name: Manually extract the installer
   ansible.builtin.command:
-    cmd: "tar xfvz /tmp/ansible-automation-platform-containerized-setup-2.5-13.tar.gz -C /tmp/"
+    cmd: "tar xfvz /tmp/ansible-automation-platform-containerized-setup-2.5-14.tar.gz -C /tmp/"
   register: extract_result
 
 # - name: Debug - Show extract result
@@ -293,7 +293,6 @@
   ansible.builtin.debug:
     msg: "URI access result for registry.redhat.io: {{ uri_result }}"
 
-# create directory as aap user /tmp/ansible-automation-platform-containerized-setup-2.5-13/collections/ansible_collections/ansible/containerized_installer/playbooks/config_as_code and recursive
 - name: Create directory for config_as_code
   ansible.builtin.file:
     path: /tmp/config_as_code
@@ -323,7 +322,7 @@
 
 - name: "Run AAP installer"
   ansible.builtin.shell: |
-    cd /tmp/ansible-automation-platform-containerized-setup-2.5-13 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
+    cd /tmp/ansible-automation-platform-containerized-setup-2.5-14 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
   register: install_result
   become_user: aap
 
