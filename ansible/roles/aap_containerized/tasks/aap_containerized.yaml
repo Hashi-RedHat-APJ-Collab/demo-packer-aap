@@ -4,6 +4,10 @@
   community.general.redhat_subscription:
     username: "{{ lookup('env', 'RHN_USERNAME') }}"
     password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+  register: subscription_result
+  retries: 3
+  delay: 10
+  until: subscription_result is not failed
 
 
 # - name: Update RHEL-based systems
