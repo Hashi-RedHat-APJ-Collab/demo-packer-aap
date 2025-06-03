@@ -1,3 +1,1 @@
 ---
-vault_url: "{{ lookup('env', 'VAULT_URL') | default('https://tf-aap-public-vault-76d1afab.7739a0fc.z1.hashicorp.cloud:8200') }}"
-vault_namespace: "{{ lookup('env', 'VAULT_NAMESPACE') | default('admin/hashi-redhat') }}"
