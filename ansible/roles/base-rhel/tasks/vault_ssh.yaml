@@ -1,9 +1,9 @@
 ## Vault SSH signing CA
 - name: Get Vault SSH CA public key
   ansible.builtin.get_url:
-    url: "{{ lookup('env', 'VAULT_URL') }}/v1/ssh/public_key"
+    url: "{{ vault_url }}/v1/ssh/public_key"
     headers:
-      X-Vault-Namespace: "admin/{{ lookup('env', 'VAULT_NAMESPACE') }}"
+      X-Vault-Namespace: "admin/{{ vault_namespace }}"
     dest: /etc/ssh/trusted-user-ca-keys.pem
     mode: '0644'
 

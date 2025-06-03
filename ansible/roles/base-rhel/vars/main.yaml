@@ -1,1 +1,3 @@
 ---
+vault_url: "{{ lookup('env', 'VAULT_URL') | default('https://vault.example.com:8200') }}"
+vault_namespace: "{{ lookup('env', 'VAULT_NAMESPACE') | default('admin/hashi-redhat') }}"
