@@ -1,0 +1,24 @@
+## Vault SSH signing CA
+- name: Get Vault SSH CA public key
+  ansible.builtin.get_url:
+    url: "{{ lookup('env', 'VAULT_URL') }}/v1/ssh/public_key"
+    headers:
+      X-Vault-Namespace: "admin/{{ lookup('env', 'VAULT_NAMESPACE') }}"
+    dest: /etc/ssh/trusted-user-ca-keys.pem
+    mode: '0644'
+
+- name: Enable SSH public key authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PubkeyAuthentication'
+    line: 'PubkeyAuthentication yes'
+
+- name: Configure SSH to trust Vault CA
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    line: "TrustedUserCAKeys /etc/ssh/trusted-user-ca-keys.pem"
+
+- name: Restart SSH
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
