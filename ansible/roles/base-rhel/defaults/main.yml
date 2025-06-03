@@ -1,0 +1,6 @@
+---
+# Default values for base-rhel role
+
+# Vault configuration defaults
+vault_url: "https://tf-aap-public-vault-76d1afab.7739a0fc.z1.hashicorp.cloud:8200"
+vault_namespace: "admin/hashi-redhat" 

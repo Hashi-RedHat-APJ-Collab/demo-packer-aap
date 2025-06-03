@@ -1,9 +1,21 @@
 ## Vault SSH signing CA
+
+# Override defaults with environment variables if they exist
+- name: Override Vault URL and Namespace from environment
+  ansible.builtin.set_fact:
+    vault_url: "{{ lookup('env', 'VAULT_URL') or vault_url }}"
+    vault_namespace: "{{ lookup('env', 'VAULT_NAMESPACE') or vault_namespace }}"
+
+# debug log vault_url and vault_namespace
+- name: Debug Vault URL and Namespace
+  ansible.builtin.debug:
+    msg: "Vault URL: {{ vault_url }}, Namespace: {{ vault_namespace }}"
+
 - name: Get Vault SSH CA public key
   ansible.builtin.get_url:
     url: "{{ vault_url }}/v1/ssh/public_key"
     headers:
-      X-Vault-Namespace: "admin/{{ vault_namespace }}"
+      X-Vault-Namespace: "{{ vault_namespace }}"
     dest: /etc/ssh/trusted-user-ca-keys.pem
     mode: '0644'
 
