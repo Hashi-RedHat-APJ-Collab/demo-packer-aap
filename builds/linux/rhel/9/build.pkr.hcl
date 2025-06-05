@@ -55,7 +55,7 @@ source "amazon-ebs" "rhel9" {
 
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
-    volume_size           = 100
+    volume_size           = 60
     volume_type           = "gp3"
     delete_on_termination = true
   }
