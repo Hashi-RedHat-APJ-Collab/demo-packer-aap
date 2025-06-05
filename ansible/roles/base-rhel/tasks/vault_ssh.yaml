@@ -15,6 +15,14 @@
     group: "{{ aap_user }}"
     mode: '0700'
 
+- name: Create authorized_keys file for vm_user if it doesn't exist
+  ansible.builtin.file:
+    path: "/home/{{ aap_user }}/.ssh/authorized_keys"
+    state: touch
+    mode: "0600"
+    owner: "{{ aap_user }}"
+    group: "{{ aap_user }}"
+
 - name: Configure passwordless sudo
   ansible.builtin.copy:
     content: "{{ aap_user }} ALL=(ALL) NOPASSWD: ALL"
