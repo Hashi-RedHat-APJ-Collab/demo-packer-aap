@@ -23,14 +23,7 @@
     owner: "{{ aap_user }}"
     group: "{{ aap_user }}"
 
-- name: Configure passwordless sudo
-  ansible.builtin.copy:
-    content: "{{ aap_user }} ALL=(ALL) NOPASSWD: ALL"
-    dest: "/etc/sudoers.d/{{ aap_user }}"
-    owner: root
-    group: root
-    mode: '0440'
-    validate: 'visudo -cf %s'
+
 
 # Vault SSH CA Configuration
 - name: Override Vault URL and Namespace from environment
@@ -50,6 +43,26 @@
     dest: /etc/ssh/trusted-user-ca-keys.pem
     mode: '0644'
 
+# cat echo /etc/ssh/trusted-user-ca-keys.pem
+- name: Ensure /etc/ssh/trusted-user-ca-keys.pem exists
+  ansible.builtin.stat:
+    path: /etc/ssh/trusted-user-ca-keys.pem
+  register: trusted_ca_key
+
+# cat the content of the file cat /etc/ssh/trusted-user-ca-keys.pem
+- name: Read content of /etc/ssh/trusted-user-ca-keys.pem
+  ansible.builtin.command:
+    cmd: cat /etc/ssh/trusted-user-ca-keys.pem
+  register: trusted_ca_key_content
+
+- name: Display trusted CA key content
+  ansible.builtin.debug:
+    var: trusted_ca_key_content.stdout
+
+- name: Restore SELinux context on SSH trust file
+  ansible.builtin.command:
+    cmd: restorecon -v /etc/ssh/trusted-user-ca-keys.pem
+
 - name: Enable SSH public key authentication
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
@@ -59,9 +72,32 @@
 - name: Configure SSH to trust Vault CA
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
+    state: present
     line: "TrustedUserCAKeys /etc/ssh/trusted-user-ca-keys.pem"
 
+- name: Register HCP Vault CA
+  ansible.builtin.command: update-ca-trust extract
+
+- name: SELinux in permissive mode
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+
+- name: Disable root SSH login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin no"
+
 - name: Restart SSH
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: sshd
     state: restarted
+# debug sshd -T
+- name: Debug SSHD configuration
+  ansible.builtin.command: sshd -T
+  register: sshd_config
+
+- name: Display SSHD configuration
+  ansible.builtin.debug:
+    var: sshd_config.stdout_lines
