@@ -51,6 +51,7 @@ source "amazon-ebs" "rhel9" {
   source_ami     = data.amazon-ami.rhel9-ue1.id
   ssh_username   = "ec2-user"
   ssh_agent_auth = false
+  ami_users    = var.ami_users
 
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
