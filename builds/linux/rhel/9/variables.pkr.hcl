@@ -44,6 +44,10 @@ variable "role" {
   default     = "aap"
 }
 
+variable "ami_users" {
+  type    = list(string)
+}
+
 # variable "role_config" {
 #   type    = string
 #   default = env("ROLE_CONFIG")
