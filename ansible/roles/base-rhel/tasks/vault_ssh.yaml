@@ -1,12 +1,35 @@
-## Vault SSH signing CA
+- name: Create AAP user
+  ansible.builtin.user:
+    name: "{{ aap_user }}"
+    comment: "Ansible Automation Platform user"
+    shell: "/bin/bash"
+    create_home: yes
+    password_lock: yes
+    state: present
 
-# Override defaults with environment variables if they exist
+- name: Create .ssh directory
+  ansible.builtin.file:
+    path: "/home/{{ aap_user }}/.ssh"
+    state: directory
+    owner: "{{ aap_user }}"
+    group: "{{ aap_user }}"
+    mode: '0700'
+
+- name: Configure passwordless sudo
+  ansible.builtin.copy:
+    content: "{{ aap_user }} ALL=(ALL) NOPASSWD: ALL"
+    dest: "/etc/sudoers.d/{{ aap_user }}"
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+
+# Vault SSH CA Configuration
 - name: Override Vault URL and Namespace from environment
   ansible.builtin.set_fact:
     vault_url: "{{ lookup('env', 'VAULT_URL') or vault_url }}"
     vault_namespace: "{{ lookup('env', 'VAULT_NAMESPACE') or vault_namespace }}"
 
-# debug log vault_url and vault_namespace
 - name: Debug Vault URL and Namespace
   ansible.builtin.debug:
     msg: "Vault URL: {{ vault_url }}, Namespace: {{ vault_namespace }}"
@@ -33,4 +56,4 @@
 - name: Restart SSH
   ansible.builtin.service:
     name: sshd
-    state: restarted
+  state: restarted
