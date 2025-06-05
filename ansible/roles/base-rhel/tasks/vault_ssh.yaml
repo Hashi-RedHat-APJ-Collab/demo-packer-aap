@@ -3,8 +3,8 @@
     name: "{{ aap_user }}"
     comment: "Ansible Automation Platform user"
     shell: "/bin/bash"
-    create_home: yes
-    password_lock: yes
+    create_home: true
+    home: "/home/{{ aap_user }}"
     state: present
 
 - name: Create .ssh directory
