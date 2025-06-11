@@ -23,8 +23,6 @@
     owner: "{{ aap_user }}"
     group: "{{ aap_user }}"
 
-
-
 # Vault SSH CA Configuration
 - name: Override Vault URL and Namespace from environment
   ansible.builtin.set_fact:
@@ -78,10 +76,10 @@
 - name: Register HCP Vault CA
   ansible.builtin.command: update-ca-trust extract
 
-- name: SELinux in permissive mode
-  ansible.posix.selinux:
-    policy: targeted
-    state: permissive
+# - name: SELinux in permissive mode
+#   ansible.posix.selinux:
+#     policy: targeted
+#     state: permissive
 
 - name: Disable root SSH login
   ansible.builtin.lineinfile:
@@ -93,11 +91,11 @@
   ansible.builtin.systemd:
     name: sshd
     state: restarted
-# debug sshd -T
-- name: Debug SSHD configuration
-  ansible.builtin.command: sshd -T
-  register: sshd_config
+# # debug sshd -T
+# - name: Debug SSHD configuration
+#   ansible.builtin.command: sshd -T
+#   register: sshd_config
 
-- name: Display SSHD configuration
-  ansible.builtin.debug:
-    var: sshd_config.stdout_lines
+# - name: Display SSHD configuration
+#   ansible.builtin.debug:
+#     var: sshd_config.stdout_lines
