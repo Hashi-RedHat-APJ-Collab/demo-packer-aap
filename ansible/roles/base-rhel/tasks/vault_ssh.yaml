@@ -6,6 +6,14 @@
     create_home: true
     home: "/home/{{ aap_user }}"
     state: present
+    
+# add aap user to sudoers but don't make root
+- name: Add AAP user to wheel group
+  ansible.builtin.user:
+    name: aap
+    groups: wheel
+    append: true
+  become: true
 
 - name: Configure passwordless sudo for aap user
   ansible.builtin.lineinfile:
@@ -15,7 +23,7 @@
     mode: '0440'
     validate: 'visudo -cf %s'
   become: true
-  
+
 - name: Create .ssh directory
   ansible.builtin.file:
     path: "/home/{{ aap_user }}/.ssh"
