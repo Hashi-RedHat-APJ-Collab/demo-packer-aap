@@ -7,6 +7,15 @@
     home: "/home/{{ aap_user }}"
     state: present
 
+- name: Configure passwordless sudo for aap user
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/aap-access
+    line: "aap ALL=(ALL) NOPASSWD: ALL"
+    create: yes
+    mode: '0440'
+    validate: 'visudo -cf %s'
+    
+  become: true
 - name: Create .ssh directory
   ansible.builtin.file:
     path: "/home/{{ aap_user }}/.ssh"
