@@ -14,8 +14,8 @@
     create: yes
     mode: '0440'
     validate: 'visudo -cf %s'
-    
   become: true
+  
 - name: Create .ssh directory
   ansible.builtin.file:
     path: "/home/{{ aap_user }}/.ssh"
