@@ -90,3 +90,11 @@ export AWS_ACCESS_KEY_ID=example
 export AWS_SECRET_ACCESS_KEY=example
 export AWS_SESSION_TOKEN=example
 ```
+
+## Build AAP image
+
+This repository comes with a [Makefile](./Makefile) that helps with the installs. Run the following to build the AAP base image:
+
+```bash
+make aap_demo
+```
