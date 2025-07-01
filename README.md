@@ -98,3 +98,11 @@ This repository comes with a [Makefile](./Makefile) that helps with the installs
 ```bash
 make aap_demo
 ```
+
+## Misc
+
+If you intend to build a RHEL9 base image that is configured to trust Vault's CA, run the following. Note that this requires additional environment variables like `VAULT_URL` and `VAULT_NAMESPACE`.
+
+```bash
+make rhel9_base
+```
