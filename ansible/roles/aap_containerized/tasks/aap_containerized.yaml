@@ -202,13 +202,13 @@
 
 - name: Download Ansible Automation Platform setup file
   ansible.builtin.get_url:
-    url: "https://github.com/Hashi-RedHat-APJ-Collab/demo-packer-aap/raw/refs/heads/main/ansible-automation-platform-containerized-setup-2.5-17.tar.gz"
-    dest: /tmp/ansible-automation-platform-containerized-setup-2.5-17.tar.gz
+    url: "https://github.com/Hashi-RedHat-APJ-Collab/demo-packer-aap/raw/refs/heads/main/{{ aaponlinecontainerizedversion }}"
+    dest: /tmp/{{ aaponlinecontainerizedversion }}
   register: download_result
 
 - name: Get information about downloaded file
   ansible.builtin.stat: 
-    path: "/tmp/ansible-automation-platform-containerized-setup-2.5-17.tar.gz"
+    path: "/tmp/{{ aaponlinecontainerizedversion }}"
   register: file_info
 
 - name: Debug - Show file info
@@ -217,7 +217,7 @@
 
 - name: Manually extract the installer
   ansible.builtin.command:
-    cmd: "tar xfvz /tmp/ansible-automation-platform-containerized-setup-2.5-17.tar.gz -C /tmp/"
+    cmd: "tar xfvz /tmp/{{ aaponlinecontainerizedversion }} -C /tmp/"
   register: extract_result
 
 # - name: Debug - Show extract result
@@ -282,7 +282,7 @@
 
 - name: Test Red Hat registry connectivity
   ansible.builtin.uri:
-    url: https://registry.redhat.io
+    url: https://catalog.redhat.com
     method: GET
     status_code: 200 # Expect a 200 OK response
     validate_certs: false # Set to true if you want to validate SSL certs
@@ -322,7 +322,7 @@
 
 - name: "Run AAP installer"
   ansible.builtin.shell: |
-    cd /tmp/ansible-automation-platform-containerized-setup-2.5-17 && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
+    cd /tmp/{{ aapfolderpath }} && ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
   register: install_result
   become_user: aap
 
