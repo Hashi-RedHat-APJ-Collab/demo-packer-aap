@@ -90,7 +90,7 @@ Enter https://access.redhat.com/terms-based-registry/ and choose `New Service Ac
 
 ![registry service accounts](./docs/04-registry-svc/01-registry-service-accounts.png)
 
-Enter a registry name. Take note of the number and name on this page. This is used for `RHN_REGISTRY_SVC`
+Enter a registry name. Take note of the number and name on this page. This is used for `RHN_REGISTRY_SVC`. The value of the `RHN_REGISTRY_SVC` environment variable follows this format: `<replace-with-number>|<replace-with-name>`. For example: `11112222|svc-registry`.
 
 ![registry name](./docs/04-registry-svc/02-registry-name.png)
 
