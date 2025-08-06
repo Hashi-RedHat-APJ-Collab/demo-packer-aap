@@ -55,6 +55,9 @@ Viewing current partner subscriptions shows the subscription start and end date
 
 # 2. Create a new subscription allocation
 
+> [!NOTE]
+> After signing up for Partner Connect, you may need to wait a few minutes before creating a new subscription allocation. If you encounter errors, please wait and try again as permissions need time to fully activate.
+
 Enter https://access.redhat.com/management/subscription_allocations and choose `Create New subscription allocation`
 
 ![create new subscription allocation](./docs/02-subscription-allocation/01-create-new-subscription-allocation.png)
