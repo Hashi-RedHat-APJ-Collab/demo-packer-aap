@@ -311,7 +311,7 @@
   ansible.builtin.debug:
     msg: "Owner: {{ dir_stats.stat.pw_name }}, Group: {{ dir_stats.stat.gr_name }}"
 
-  # test create file in the directory
+# test create file in the directory
 - name: Create test file in config_as_code directory
   ansible.builtin.file:
     path: /tmp/config_as_code/test_file.txt
@@ -325,7 +325,30 @@
     paths: "/tmp/{{ aapfolderpath }}"
     patterns: "install.yml,install.yaml,site.yml"
     file_type: file
-  register: installer_playbook
+  register: aap_containerized_installer_playbook
+
+# Add after the "Find AAP installer playbook" task:
+- name: "Debug - Show AAP installer directory contents"
+  ansible.builtin.shell: "ls -la /tmp/{{ aapfolderpath }}"
+  register: aap_dir_contents
+
+- name: "Debug - Display directory contents"
+  ansible.builtin.debug:
+    var: aap_dir_contents.stdout_lines
+
+- name: "Debug - Find all files in AAP directory"
+  ansible.builtin.find:
+    paths: "/tmp/{{ aapfolderpath }}"
+    file_type: file
+  register: all_files
+
+- name: "Debug - Display all found files"
+  ansible.builtin.debug:
+    msg: "Found files: {{ all_files.files | map(attribute='path') | list }}"
+
+- name: "Debug - Show find results"
+  ansible.builtin.debug:
+    var: installer_playbook
 
 - name: "Run AAP installer"
   ansible.builtin.shell: |
