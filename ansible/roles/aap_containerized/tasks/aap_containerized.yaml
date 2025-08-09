@@ -330,39 +330,71 @@
 # Add after the "Find AAP installer playbook" task:
 - name: "Debug - Show AAP installer directory contents"
   ansible.builtin.shell: "ls -la /tmp/{{ aapfolderpath }}"
-  register: aap_dir_contents
+  register: aap_containerized_dir_contents
 
 - name: "Debug - Display directory contents"
   ansible.builtin.debug:
-    var: aap_dir_contents.stdout_lines
+    var: aap_containerized_dir_contents.stdout_lines
 
 - name: "Debug - Find all files in AAP directory"
   ansible.builtin.find:
     paths: "/tmp/{{ aapfolderpath }}"
     file_type: file
-  register: all_files
+  register: aap_containerized_all_files
 
 - name: "Debug - Display all found files"
   ansible.builtin.debug:
-    msg: "Found files: {{ all_files.files | map(attribute='path') | list }}"
+    msg: "Found files: {{ aap_containerized_all_files.files | map(attribute='path') | list }}"
 
 - name: "Debug - Show find results"
   ansible.builtin.debug:
-    var: installer_playbook
+    var: aap_containerized_installer_playbook
 
-- name: "Run AAP installer"
+- name: "Check for AAP setup script as fallback"
+  ansible.builtin.stat:
+    path: "/tmp/{{ aapfolderpath }}/setup.sh"
+  register: aap_containerized_setup_script
+
+- name: "Debug - Show setup script status"
+  ansible.builtin.debug:
+    msg: "Setup script exists: {{ aap_containerized_setup_script.stat.exists }}"
+
+- name: "Verify installer playbook was found"
+  ansible.builtin.fail:
+    msg: "No AAP installer playbook found in /tmp/{{ aapfolderpath }} and no setup.sh script available"
+  when: 
+    - aap_containerized_installer_playbook.files | length == 0
+    - not aap_containerized_setup_script.stat.exists
+
+- name: "Run AAP installer via ansible-playbook"
   ansible.builtin.shell: |
     cd /tmp/{{ aapfolderpath }} && \
-    ansible-playbook -i /tmp/inventory-growth {{ installer_playbook.files[0].path | basename }}
-  register: install_result
+    ansible-playbook -i /tmp/inventory-growth {{ aap_containerized_installer_playbook.files[0].path | basename }}
+  register: aap_containerized_install_result
   become_user: aap
   environment:
     # Ensure required environment variables are available
     AAP_ADMIN_PASSWORD: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
     RHN_REGISTRY_SVC: "{{ lookup('env', 'RHN_REGISTRY_SVC') }}"
     RHN_REGISTRY_TOKEN: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
-  when: installer_playbook.files | length > 0
+  when: aap_containerized_installer_playbook.files | length > 0
+  failed_when: aap_containerized_install_result.rc != 0
+
+- name: "Run AAP installer via setup script (fallback)"
+  ansible.builtin.shell: |
+    cd /tmp/{{ aapfolderpath }} && \
+    ./setup.sh -i /tmp/inventory-growth
+  register: aap_containerized_install_result
+  become_user: aap
+  environment:
+    AAP_ADMIN_PASSWORD: "{{ lookup('env', 'AAP_ADMIN_PASSWORD') }}"
+    RHN_REGISTRY_SVC: "{{ lookup('env', 'RHN_REGISTRY_SVC') }}"
+    RHN_REGISTRY_TOKEN: "{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
+  when: 
+    - aap_containerized_installer_playbook.files | length == 0
+    - aap_containerized_setup_script.stat.exists
+  failed_when: aap_containerized_install_result.rc != 0
 
 - name: "Display Final Installation Result"
   ansible.builtin.debug:
-    var: install_result
+    var: aap_containerized_install_result
