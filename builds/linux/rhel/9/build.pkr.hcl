@@ -46,7 +46,7 @@ data "amazon-ami" "rhel9-ue1" {
 
 source "amazon-ebs" "rhel9" {
   ami_name       = "${var.ami_prefix}-${local.timestamp}"
-  instance_type  = "m6a.xlarge"
+  instance_type  = "m6a.2xlarge"
   region         = var.aws_region
   source_ami     = data.amazon-ami.rhel9-ue1.id
   ssh_username   = "ec2-user"
