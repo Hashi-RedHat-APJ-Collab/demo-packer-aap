@@ -116,3 +116,11 @@
 # - name: Display SSHD configuration
 #   ansible.builtin.debug:
 #     var: sshd_config.stdout_lines
+
+- name: Install packages
+  dnf:
+    name:
+      - httpd
+      - unzip
+    state: latest
+
