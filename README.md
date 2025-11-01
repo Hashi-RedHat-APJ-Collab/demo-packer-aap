@@ -59,10 +59,13 @@ HUB_OFFLINE_TOKEN="your-access-token-here" # e.g. "ey...."
 
 ### Create ansible.cfg file
 
-An `ansible.cfg` file is required in the root directory for installing supported AAP collections from Red Hat Automation Hub. Replace `<HUB_TOKEN>` below with teh value of `HUB_OFFLINE_TOKEN` that is retrieved in the previous step.
+An `ansible.cfg` file is required in the root directory for installing supported AAP collections from Red Hat Automation Hub. Replace `<HUB_TOKEN>` below with the value of `HUB_OFFLINE_TOKEN` that is retrieved in the previous step.
 
 > [!NOTE]
 > To access private content from Red Hat Automation Hub via `ansible-galaxy`, a token is required. This token is used in `ansible.cfg` but should **never be committed to source control**.
+
+> [!WARNING]  
+> The `HUB_OFFLINE_TOKEN` expires after 30 days of inactivity. Generate a new token if it has been 30 days or more since your last build.
 
 ```
 [galaxy]
@@ -106,3 +109,10 @@ If you intend to build a RHEL9 base image that is configured to trust Vault's CA
 ```bash
 make rhel9_base
 ```
+
+## Troubleshooting
+
+Double check the following if your builds are failing
+
+1. The tokens `RHSM_OFFLINE_TOKEN` and `HUB_OFFLINE_TOKEN` expire afer 30 days of inactivity. Ensure that new ones are generated if they are expired.
+2. Ensure that the `ansible.cfg` file is created in the root directory and that the `HUB_OFFLINE_TOKEN` matches the value used in the environment variable.
