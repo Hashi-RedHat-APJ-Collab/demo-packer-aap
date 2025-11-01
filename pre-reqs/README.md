@@ -10,7 +10,7 @@ export RHSM_OFFLINE_TOKEN="some_offline_token" #subscription offline token https
 export RHN_REGISTRY_SVC="16723312|svc-registry" #registry service account https://access.redhat.com/terms-based-registry/
 export RHN_REGISTRY_TOKEN="ey---------"
 export AAP_ADMIN_PASSWORD="Hashi123!" #Ansible Automation Platform admin password. Set your own password.
-export HUB_OFFLINE_TOKEN="ey..." #Automation Hub offline token https://console.redhat.com/ansible/automation-hub/token
+export HUB_OFFLINE_TOKEN="ey..." #Automation Hub offline token https://console.redhat.com/ansible/automation-hub/token expires with 30 days inactivity
 ```
 
 # 1. Partner connect
@@ -84,6 +84,9 @@ Copy the offline token. This is used for `RHSM_OFFLINE_TOKEN`
 
 ![copy token](./docs/03-offline-token/02-copy-token.png)
 
+> [!WARNING]  
+> This token expires after 30 days of inactivity. Generate a new token if it has been 30 days or more since your last build.
+
 # 4. Registry Service Account
 
 Enter https://access.redhat.com/terms-based-registry/ and choose `New Service Account`
@@ -111,3 +114,6 @@ Enter https://console.redhat.com/ansible/automation-hub/token and under `Offline
 This displays the offline token. Copy the offline token. This is used for `HUB_OFFLINE_TOKEN`
 
 ![offline token](./docs/05-hub-token/02-offline-token.png)
+
+> [!WARNING]  
+> This token expires after 30 days of inactivity. Generate a new token if it has been 30 days or more since your last build.
