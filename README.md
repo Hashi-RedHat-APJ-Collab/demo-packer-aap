@@ -28,20 +28,20 @@ Follow [pre-reqs/README.md](./pre-reqs/README.md) to get all the IDs and tokens 
 
 ### Export environment variables
 
-There are 2 methods you can use to handle the environment variables. You can export them as shown below:
+There are 2 methods you can use to handle the environment variables. You can export them as shown below, but you must still create a `.env.local` file in the project root since the [Makefile](./Makefile) requires it when running `make aap_demo`.
 
 ```bash
 export RHN_USERNAME="glennchia-hashi"
 export RHN_PASSWORD="some_password"
-export RHSM_ALLOCATION_UUID="7f4075b9-38ac-46e3-986d-bf481d1853be" #subscription allocation uuid https://access.redhat.com/management/subscription_allocations
-export RHSM_OFFLINE_TOKEN="some_offline_token" #subscription offline token https://access.redhat.com/management/api expires with 30 days inactivity
-export RHN_REGISTRY_SVC="16723312|svc-registry" #registry service account https://access.redhat.com/terms-based-registry/
+export RHSM_ALLOCATION_UUID="7f4075b9-38ac-46e3-986d-bf481d1853be"
+export RHSM_OFFLINE_TOKEN="some_offline_token"
+export RHN_REGISTRY_SVC="16723312|svc-registry"
 export RHN_REGISTRY_TOKEN="ey---------"
-export AAP_ADMIN_PASSWORD="Hashi123!" #Ansible Automation Platform admin password. Set your own password.
-export HUB_OFFLINE_TOKEN="ey..." #Automation Hub offline token https://console.redhat.com/ansible/automation-hub/token
+export AAP_ADMIN_PASSWORD="Hashi123!"
+export HUB_OFFLINE_TOKEN="ey..."
 ```
 
-Or you can set them in a `.env.local` file in the project root with the following. This file is automatically loaded by the Makefile when running targets like make aap_demo.
+Or you can set them in a `.env.local` file in the project root with the following. This file is automatically loaded by the Makefile when running targets like `make aap_demo`. This file is also listed in the [.gitignore](./.gitignore).
 
 ```ini
 # .env.local
@@ -52,10 +52,8 @@ RHSM_OFFLINE_TOKEN="some_offline_token"
 RHN_REGISTRY_SVC="16723312|svc-registry"
 RHN_REGISTRY_TOKEN="ey---------"
 AAP_ADMIN_PASSWORD="Hashi123!"
-HUB_OFFLINE_TOKEN="your-access-token-here" # e.g. "ey...."
+HUB_OFFLINE_TOKEN="your-access-token-here"
 ```
-
-🔒 Make sure .env.local is listed in .gitignore to avoid committing sensitive credentials.
 
 ### Create ansible.cfg file
 
