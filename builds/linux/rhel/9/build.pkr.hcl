@@ -93,6 +93,11 @@ build {
     ]
   }
 
+  provisioner "file" {
+    source = "./ansible-automation-platform-containerized-setup-2.5-21.tar.gz"
+    destination = "/tmp/ansible-automation-platform-containerized-setup-2.5-21.tar.gz"
+  }
+
   provisioner "ansible" {
     playbook_file = "${path.cwd}/ansible/playbook.yml"
     use_sftp      = false

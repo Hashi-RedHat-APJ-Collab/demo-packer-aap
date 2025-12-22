@@ -2,4 +2,4 @@
 build_timeout = "2h"
 ansible_timeout = "1h"
 ssh_timeout = "30m" 
-ami_users = ["258850230659"]
+ami_users = ["149536468958"]

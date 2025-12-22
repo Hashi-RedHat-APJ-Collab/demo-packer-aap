@@ -200,11 +200,6 @@
   ansible.builtin.debug:
     var: manifest_file
 
-- name: Download Ansible Automation Platform setup file
-  ansible.builtin.get_url:
-    url: "https://github.com/Hashi-RedHat-APJ-Collab/demo-packer-aap/raw/refs/heads/main/{{ aaponlinecontainerizedversion }}"
-    dest: /tmp/{{ aaponlinecontainerizedversion }}
-  register: download_result
 
 - name: Get information about downloaded file
   ansible.builtin.stat: 
