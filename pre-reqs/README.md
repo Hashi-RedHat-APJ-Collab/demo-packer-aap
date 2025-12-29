@@ -9,7 +9,7 @@ export RHSM_ALLOCATION_UUID="7f4075b9-38ac-46e3-986d-bf481d1853be" #subscription
 export RHSM_OFFLINE_TOKEN="some_offline_token" #subscription offline token https://access.redhat.com/management/api expires with 30 days inactivity
 export RHN_REGISTRY_SVC="16723312|svc-registry" #registry service account https://access.redhat.com/terms-based-registry/
 export RHN_REGISTRY_TOKEN="ey---------"
-export AAP_ADMIN_PASSWORD="Hashi123!" #Ansible Automation Platform admin password. Set your own password.
+export AAP_ADMIN_PASSWORD=Hashi123! #Ansible Automation Platform admin password. Set your own password.
 export HUB_OFFLINE_TOKEN="ey..." #Automation Hub offline token https://console.redhat.com/ansible/automation-hub/token expires with 30 days inactivity
 ```
 
@@ -84,7 +84,7 @@ Copy the offline token. This is used for `RHSM_OFFLINE_TOKEN`
 
 ![copy token](./docs/03-offline-token/02-copy-token.png)
 
-> [!WARNING]  
+> [!WARNING]
 > This token expires after 30 days of inactivity. Generate a new token if it has been 30 days or more since your last build.
 
 # 4. Registry Service Account
@@ -115,5 +115,5 @@ This displays the offline token. Copy the offline token. This is used for `HUB_O
 
 ![offline token](./docs/05-hub-token/02-offline-token.png)
 
-> [!WARNING]  
+> [!WARNING]
 > This token expires after 30 days of inactivity. Generate a new token if it has been 30 days or more since your last build.

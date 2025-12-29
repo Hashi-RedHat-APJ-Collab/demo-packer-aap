@@ -37,7 +37,7 @@ export RHSM_ALLOCATION_UUID="7f4075b9-38ac-46e3-986d-bf481d1853be"
 export RHSM_OFFLINE_TOKEN="some_offline_token"
 export RHN_REGISTRY_SVC="16723312|svc-registry"
 export RHN_REGISTRY_TOKEN="ey---------"
-export AAP_ADMIN_PASSWORD="Hashi123!"
+export AAP_ADMIN_PASSWORD=Hashi123!
 export HUB_OFFLINE_TOKEN="ey..."
 ```
 
@@ -51,7 +51,7 @@ RHSM_ALLOCATION_UUID="7f4075b9-38ac-46e3-986d-bf481d1853be"
 RHSM_OFFLINE_TOKEN="some_offline_token"
 RHN_REGISTRY_SVC="16723312|svc-registry"
 RHN_REGISTRY_TOKEN="ey---------"
-AAP_ADMIN_PASSWORD="Hashi123!"
+AAP_ADMIN_PASSWORD=Hashi123!
 HUB_OFFLINE_TOKEN="your-access-token-here"
 ```
 
@@ -62,7 +62,7 @@ An `ansible.cfg` file is required in the root directory for installing supported
 > [!NOTE]
 > To access private content from Red Hat Automation Hub via `ansible-galaxy`, a token is required. This token is used in `ansible.cfg` but should **never be committed to source control**.
 
-> [!WARNING]  
+> [!WARNING]
 > The `HUB_OFFLINE_TOKEN` expires after 30 days of inactivity. Generate a new token if it has been 30 days or more since your last build.
 
 ```
