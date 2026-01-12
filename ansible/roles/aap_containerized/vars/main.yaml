@@ -1,5 +1,5 @@
 ---
 aap_hostname: aap.demo.local
 registry_password: ""
-aaponlinecontainerizedversion: "ansible-automation-platform-containerized-setup-2.5-17.tar.gz"
-aapfolderpath: "ansible-automation-platform-containerized-setup-2.5-17"
+aaponlinecontainerizedversion: "ansible-automation-platform-containerized-setup-2.5-21.tar.gz"
+aapfolderpath: "ansible-automation-platform-containerized-setup-2.5-21"
