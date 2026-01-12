@@ -114,3 +114,7 @@ Double check the following if your builds are failing
 
 1. The tokens `RHSM_OFFLINE_TOKEN` and `HUB_OFFLINE_TOKEN` expire afer 30 days of inactivity. Ensure that new ones are generated if they are expired.
 2. Ensure that the `ansible.cfg` file is created in the root directory and that the `HUB_OFFLINE_TOKEN` matches the value used in the environment variable.
+
+3. If you are getting `Failed to get token` errors with `<urlopen error [Error 111] Connection refused>` this indicates that the ansible containerized setup `tar.gz` could be outdated. Visit https://access.redhat.com/downloads/content/480/ver=2.5/rhel---9/2.5/x86_64/product-software to download the latest `Ansible Automation Platform 2.5 Containerized Setup`. Then change the `aaponlinecontainerizedversion` and `aapfolderpath` variables in [main.yaml](./ansible/roles/aap_containerized/vars/main.yaml) with the up-to-date version. An example of these changes can be found in this [pull request](https://github.com/Hashi-RedHat-APJ-Collab/demo-packer-aap/pull/7).
+
+![download AAP containerized setup](./docs/troubleshooting/01-download-aap-containerized-setup.png)
