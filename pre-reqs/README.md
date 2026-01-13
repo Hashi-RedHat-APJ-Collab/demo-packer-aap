@@ -74,6 +74,19 @@ Subscription allocation details. `UUID` is used for `RHSM_ALLOCATION_UUID`.
 
 ![subscription allocation details](./docs/02-subscription-allocation/04-subscription-allocation-details.png)
 
+Finally, confirm that the `Subscriptions` tab displays `Red Hat Partner Subscription (500 Nodes)` with `Entitlements` showing a value of `1`.
+
+![subscriptions](./docs/02-subscription-allocation/05-subscriptions-valid.png)
+
+> [!NOTE]
+> Follow the steps below if the `Subscriptions` tab displays `There are no subscriptions to display`
+
+![no subscriptions](./docs/02-subscription-allocation/06-subscriptions-blank.png)
+
+Add 1 entitlement to the `Red Hat Partner Subscription (500 Nodes)` subscription and click `Submit`. After adding it, check the `Subscriptions` tab to verify the subscription appears. If it's not visible immediately, wait a moment and reload the page.
+
+![add subscription for 500 nodes](./docs/02-subscription-allocation/07-add-subscription-500-nodes.png)
+
 # 3. Offline token generation
 
 Enter https://access.redhat.com/management/api and choose `GENERATE TOKEN`
