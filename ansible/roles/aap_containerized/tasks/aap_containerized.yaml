@@ -28,8 +28,6 @@
     - RHN_REGISTRY_TOKEN
     - RHN_ACTIVATIONKEY
     - RHN_ORG_ID
-    - RHSM_OFFLINE_TOKEN
-    - RHSM_ALLOCATION_UUID
 
  # create aap user  adduser aap
 - name: Create AAP user
