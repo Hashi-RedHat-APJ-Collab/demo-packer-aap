@@ -107,22 +107,9 @@ jobs:
           role-duration-seconds: 7200
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Run Makefile with retries
+      - name: Run Makefile
         shell: bash
-        run: |
-          max_attempts=1
-          attempt=1
-          until make ${{ matrix.image_type }} || [ $attempt -eq $max_attempts ]
-          do
-            echo "Attempt $attempt failed! Retrying in 30 seconds..."
-            attempt=$(( attempt + 1 ))
-            sleep 30
-          done
-
-          if [ $attempt -eq $max_attempts ] && ! make ${{ matrix.image_type }}; then
-            echo "All $max_attempts attempts failed"
-            exit 1
-          fi
+        run: make ${{ matrix.image_type }}
         
 
       
