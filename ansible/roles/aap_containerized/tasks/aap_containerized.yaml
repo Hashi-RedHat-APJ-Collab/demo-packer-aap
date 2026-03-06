@@ -2,8 +2,8 @@
 - name: Register subscription for RHEL
   when: ansible_os_family == 'RedHat'
   community.general.redhat_subscription:
-    username: "{{ lookup('env', 'RHN_USERNAME') }}"
-    password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+    activationkey: "{{ lookup('env', 'RHN_ACTIVATIONKEY') }}"
+    org_id: "{{ lookup('env', 'RHN_ORG_ID') }}"
   register: subscription_result
   retries: 3
   delay: 10
@@ -26,8 +26,8 @@
     - AAP_ADMIN_PASSWORD
     - RHN_REGISTRY_SVC
     - RHN_REGISTRY_TOKEN
-    - RHN_USERNAME
-    - RHN_PASSWORD
+    - RHN_ACTIVATIONKEY
+    - RHN_ORG_ID
     - RHSM_OFFLINE_TOKEN
     - RHSM_ALLOCATION_UUID
 
