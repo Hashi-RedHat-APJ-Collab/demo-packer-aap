@@ -76,6 +76,10 @@ controller_postinstall_repo_url=https://github.com/Hashi-RedHat-APJ-Collab/platf
 controller_postinstall_dir=/tmp/config_as_code/aap
 controller_postinstall_repo_ref=main
 
+# Redis - single node setup, colocated with controller
+[redis]
+{{ aap_hostname }}
+
 #deploy remote execution nodes
 #[execution_nodes]
 #<fqdn_of_your_execution_host>
