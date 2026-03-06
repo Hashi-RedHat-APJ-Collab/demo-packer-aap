@@ -108,6 +108,42 @@ If you intend to build a RHEL9 base image that is configured to trust Vault's CA
 make rhel9_base
 ```
 
+## GitHub Actions CI
+
+The `Packer Build` workflow runs automatically on pull requests targeting `main`. It builds `rhel_9_base` by default. The `aap_demo` target is local-only (requires `.env.local`) and is excluded from CI.
+
+### Repository Variables
+
+Set these under **Settings → Secrets and variables → Actions → Variables**:
+
+| Variable | Description |
+|----------|-------------|
+| `AWS_ROLE_ARN` | IAM role ARN for GitHub Actions OIDC auth to AWS (e.g. `arn:aws:iam::123456789:role/GitHubActionsRole`) |
+| `AWS_REGION` | AWS region to build images in (e.g. `ap-southeast-1`) |
+
+### Repository Secrets
+
+Set these under **Settings → Secrets and variables → Actions → Secrets**:
+
+| Secret | Description |
+|--------|-------------|
+| `ANSIBLE_OFFLINE_TOKEN` | Red Hat Automation Hub offline token from `console.redhat.com/ansible/automation-hub/token`. Expires after 30 days of inactivity. |
+| `CONTROLLER_HOST` | AAP controller hostname (required for `aap_demo`, `rhel_9_aap_job`, `rhel_9_aap_workflow` targets) |
+| `CONTROLLER_USERNAME` | AAP controller username |
+| `CONTROLLER_PASSWORD` | AAP controller password |
+
+### IAM Role Trust Policy
+
+The IAM role set in `AWS_ROLE_ARN` must trust GitHub Actions OIDC for this repo:
+
+```json
+{
+  "StringLike": {
+    "token.actions.githubusercontent.com:sub": "repo:Hashi-RedHat-APJ-Collab/*"
+  }
+}
+```
+
 ## Troubleshooting
 
 Double check the following if your builds are failing
