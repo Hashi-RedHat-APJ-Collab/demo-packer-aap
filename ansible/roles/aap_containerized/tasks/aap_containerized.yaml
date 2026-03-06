@@ -359,6 +359,14 @@
   ansible.builtin.debug:
     msg: "Setup script exists: {{ aap_containerized_setup_script.stat.exists }}"
 
+- name: "Set ownership of AAP installer directory to aap user"
+  ansible.builtin.file:
+    path: "/tmp/{{ aapfolderpath }}"
+    owner: aap
+    group: aap
+    recurse: yes
+  become: true
+
 - name: "Run AAP containerized installation using collection"
   ansible.builtin.shell: |
     cd /tmp/{{ aapfolderpath }} && \
