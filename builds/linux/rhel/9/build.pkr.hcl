@@ -32,16 +32,29 @@ packer {
   }
 }
 
+# Original Red Hat source AMI - kept for reference
+# data "amazon-ami" "rhel9-ue1" {
+#   region = var.aws_region
+#   filters = {
+#     name                = "RHEL-9*-x86_64-*"
+#     root-device-type    = "ebs"
+#     virtualization-type = "hvm"
+#   }
+#   most_recent = true
+#   owners      = ["309956199498"] # Red Hat
+# }
+
+# HC-COMPUTE-011: switched to HashiCorp approved base image (EDR pre-installed)
 data "amazon-ami" "rhel9-ue1" {
   region = var.aws_region
   filters = {
-    name                = "RHEL-9*-x86_64-*"
+    name                = "hc-base-rhel-9*-x86_64-*"
     root-device-type    = "ebs"
     virtualization-type = "hvm"
-    
+    state               = "available"
   }
   most_recent = true
-  owners      = ["309956199498"] # Red Hat
+  owners      = ["888995627335"] # HashiCorp ami-prod account
 }
 
 source "amazon-ebs" "rhel9" {
