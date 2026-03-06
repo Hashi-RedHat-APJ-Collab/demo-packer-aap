@@ -80,6 +80,9 @@ jobs:
 
       - name: Print Ansible version
         run: ansible-playbook --version
+
+      - name: Install Python dependencies
+        run: pip install passlib
       
       - name: Create ansible.cfg
         run: |
