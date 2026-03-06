@@ -91,10 +91,10 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::124355636080:role/DynamicCredsHCP-GitHubActionsServiceRole-74Kqdhl1FtBW
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           role-session-name: GitHubActionsServiceRole
           role-duration-seconds: 900
-          aws-region: ap-southeast-1
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Run Makefile with retries
         shell: bash
