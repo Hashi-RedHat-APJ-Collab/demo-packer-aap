@@ -32,39 +32,22 @@ packer {
   }
 }
 
-# Original Red Hat source AMI - kept for reference
-# data "amazon-ami" "rhel9-ue1" {
-#   region = var.aws_region
-#   filters = {
-#     name                = "RHEL-9*-x86_64-*"
-#     root-device-type    = "ebs"
-#     virtualization-type = "hvm"
-#   }
-#   most_recent = true
-#   owners      = ["309956199498"] # Red Hat
-# }
-
-# HC-COMPUTE-011: switched to HashiCorp approved base image (EDR pre-installed)
-data "amazon-ami" "rhel9-ue1" {
-  region = var.aws_region
-  filters = {
-    name                = "hc-base-rhel-9*-x86_64-*"
-    root-device-type    = "ebs"
-    virtualization-type = "hvm"
-    state               = "available"
-  }
-  most_recent = true
-  owners      = ["888995627335"] # HashiCorp ami-prod account
+# Use the RHEL9-SOE hardened base image from HCP Packer Registry
+data "hcp-packer-artifact" "rhel9-soe" {
+  bucket_name  = "RHEL9-SOE"
+  platform     = "aws"
+  region       = var.aws_region
+  channel_name = "latest"
 }
 
 source "amazon-ebs" "rhel9" {
   ami_name       = "${var.ami_prefix}-${local.timestamp}"
   instance_type  = "m6a.2xlarge"
   region         = var.aws_region
-  source_ami     = data.amazon-ami.rhel9-ue1.id
+  source_ami     = data.hcp-packer-artifact.rhel9-soe.external_identifier
   ssh_username   = "ec2-user"
   ssh_agent_auth = false
-  ami_users    = var.ami_users
+  ami_users      = var.ami_users
 
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
@@ -79,21 +62,20 @@ source "amazon-ebs" "rhel9" {
  
 
 build {
-#   hcp_packer_registry {
-#     bucket_name = "rhel9"
-#     description = <<EOT
-#     Ansible provsioner
-#     EOT
-#     bucket_labels = {
-#       "owner" = "sa-apj-team"
-#       "os"    = "RHEL"
-#     }
-
-#     build_labels = {
-#       "build-time"   = timestamp()
-#       "build-source" = basename(path.cwd)
-#     }
-#   }
+  hcp_packer_registry {
+    bucket_name = "RHEL9-AAP"
+    description = "RHEL9 AAP controller image built on RHEL9-SOE base"
+    bucket_labels = {
+      "owner" = "glimpsovstar"
+      "os"    = "RHEL"
+      "role"  = "aap-controller"
+    }
+    build_labels = {
+      "build-time"   = timestamp()
+      "build-source" = basename(path.cwd)
+      "base-image"   = data.hcp-packer-artifact.rhel9-soe.external_identifier
+    }
+  }
   sources = [
     "source.amazon-ebs.rhel9"
   ]

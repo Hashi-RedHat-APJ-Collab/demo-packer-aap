@@ -1,33 +1,33 @@
-# This section is for your AAP Gateway host(s)
-# -----------------------------------------------------
+# AAP 2.7 containerized inventory (growth = single-node all-in-one)
+
 [automationgateway]
 {{ aap_hostname }}
 
-# This section is for your AAP Controller host(s)
-# -----------------------------------------------------
 [automationcontroller]
 {{ aap_hostname }}
 
-# This section is for your AAP Automation Hub host(s)
-# -----------------------------------------------------
 [automationhub]
 {{ aap_hostname }}
 
-# This section is for your AAP EDA Controller host(s)
-# -----------------------------------------------------
 [automationeda]
 {{ aap_hostname }}
 
-# This section is for the AAP database
-# -----------------------------------------------------
+[automationmetrics]
+{{ aap_hostname }}
+
 [database]
 {{ aap_hostname }}
 
 [all:vars]
-# Ansible
 ansible_connection=local
 
-# Common variables
+# Feature flags — enable AAP 2.7 OIDC workload identity for HashiCorp Vault.
+# Surfaces new "HashiCorp Vault Secret Lookup (OIDC)" + "HashiCorp Vault Signed
+# SSH (OIDC)" credential types so AAP can auth to Vault via short-lived JWTs
+# instead of static AppRole IDs. Note Python dict literal (True, not true).
+feature_flags={"FEATURE_OIDC_WORKLOAD_IDENTITY_ENABLED": True}
+
+# Common
 postgresql_admin_username=postgres
 postgresql_admin_password={{ new_install_password }}
 
@@ -36,50 +36,41 @@ registry_password={{ registry_password }}
 
 redis_mode=standalone
 
-# AAP Gateway
+# Gateway
 gateway_admin_password={{ new_install_password }}
 gateway_pg_host={{ aap_hostname }}
 gateway_pg_password={{ new_install_password }}
 
-# AAP Controller
+# Controller
 controller_admin_password={{ new_install_password }}
 controller_pg_host={{ aap_hostname }}
 controller_pg_password={{ new_install_password }}
 controller_percent_memory_capacity=0.5
 
-# AAP Automation Hub
+# Hub
 hub_admin_password={{ new_install_password }}
 hub_pg_host={{ aap_hostname }}
 hub_pg_password={{ new_install_password }}
 hub_seed_collections=false
-automationhub_api_token={{ offline_token }}
 
-# AAP EDA Controller
+# EDA
 eda_admin_password={{ new_install_password }}
 eda_pg_host={{ aap_hostname }}
 eda_pg_password={{ new_install_password }}
 
-#configure a HAProxy load balancer in front of platform gateway with a custom CA cert
-# NOTE: HAProxy SSL passthrough mode is not supported with platform gateway
-#custom_ca_cert=<path_to_cert_crt>
-#gateway_main_url=<https://load_balancer_url>
+# Automation Metrics (new required component in 2.7)
+automationmetrics_pg_host={{ aap_hostname }}
+automationmetrics_pg_password={{ new_install_password }}
+automationmetrics_controller_read_pg_host={{ aap_hostname }}
+automationmetrics_controller_read_pg_password={{ new_install_password }}
 
-#configure shared storage for automation hub
-#ensuring your network file system (NFS) share has read, write, and execute permissions
-#hub_shared_data_path=<path_to_nfs_share>:/
-#hub_shared_data_mount_opts='nfsvers=4.1,hard,noresvport,rsize=1048576,wsize=1048576,timeo=600,retrans=2,_netdev,nofail'
-
-#define the location of your automation controller license file
+# Controller license + post-install config-as-code (Packer first-install only)
 controller_license_file=/tmp/manifest_AAP_Demo.zip
 controller_postinstall=true
 controller_postinstall_repo_url=https://github.com/Hashi-RedHat-APJ-Collab/platform-aap-postinstall_repo.git
 controller_postinstall_dir=/tmp/config_as_code/aap
 controller_postinstall_repo_ref=main
 
-# Redis - single node setup, colocated with controller
-[redis]
-{{ aap_hostname }}
-
-#deploy remote execution nodes
+# deploy remote execution nodes
 #[execution_nodes]
 #<fqdn_of_your_execution_host>

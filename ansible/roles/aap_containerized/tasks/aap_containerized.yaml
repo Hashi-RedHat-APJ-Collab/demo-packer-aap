@@ -67,36 +67,37 @@
     validate: 'visudo -cf %s'
   become: true
 
-- name: Install Podman
+- name: Install container-tools
   ansible.builtin.dnf:
     name: container-tools
     state: present
   become: true
   register: podman_install
 
-- name: Install Podman
+- name: Install podman-docker
   ansible.builtin.dnf:
     name: podman-docker
     state: present
   become: true
   register: podman_docker
 
-- block:
-  - name: "Login to Red Hat Registry"
-    ansible.builtin.command:
-      cmd: "podman login registry.redhat.io -u \"{{ lookup('env', 'RHN_REGISTRY_SVC') }}\" --password \"{{ lookup('env', 'RHN_REGISTRY_TOKEN') }}\""
-  - name: Validate pull image
-    ansible.builtin.shell: |
-      podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel9:latest
-      podman pull registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel8:latest
-      podman pull registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9:latest
-      podman pull registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel8:latest
-    register: podman_pull_result
-    changed_when: podman_pull_result.rc == 0
+- name: Validate Red Hat registry auth as aap user
+  block:
+    - name: Login to Red Hat Registry
+      ansible.builtin.command:
+        cmd: "podman login registry.redhat.io -u {{ lookup('env', 'RHN_REGISTRY_SVC') }} --password {{ lookup('env', 'RHN_REGISTRY_TOKEN') }}"
+      changed_when: false
+      no_log: true
+    - name: Validate pull image
+      # EE images in 2.7 dropped the :latest tag; pull a core image instead to validate registry auth.
+      ansible.builtin.command:
+        cmd: podman pull registry.redhat.io/ansible-automation-platform-27/controller-rhel9:latest
+      register: podman_pull_result
+      changed_when: podman_pull_result.rc == 0
+  become: true
   become_user: aap
   become_method: sudo
-  become: true
-  
+
 - name: Debug Podman Pull
   ansible.builtin.debug:
     var: podman_pull_result
@@ -106,7 +107,8 @@
   ansible.builtin.command:
     cmd: subscription-manager config --rhsm.manage_repos=1
   register: rhsm_manage_repos
-  changed_when: rhsm_manage_repos.rc != 0
+  changed_when: rhsm_manage_repos.rc == 0
+  become: true
 
 - name: Install required packages
   block:
@@ -216,8 +218,10 @@
     var: file_info
 
 - name: Manually extract the installer
-  ansible.builtin.command:
-    cmd: "tar xfvz /tmp/{{ aaponlinecontainerizedversion }} -C /tmp/"
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ aaponlinecontainerizedversion }}"
+    dest: "/tmp/"
+    remote_src: true
   register: extract_result
 
 # - name: Debug - Show extract result
@@ -259,13 +263,14 @@
   register: inventory_file
 
 # output inventory file
-- name: Debug - Show inventory file
-  ansible.builtin.shell: cat /tmp/inventory-growth
-  register: result
-  
+- name: Read inventory file for debug
+  ansible.builtin.slurp:
+    src: /tmp/inventory-growth
+  register: inventory_content
+
 - name: Show file content
   ansible.builtin.debug:
-    msg: "{{ result.stdout }}"
+    msg: "{{ inventory_content.content | b64decode }}"
 
 - name: Set the system hostname for the AAP installer
   become: true
@@ -318,6 +323,7 @@
     state: touch
     owner: aap
     mode: '0644'
+  become: true
   become_user: aap
 
 - name: "Find AAP installer playbook"
@@ -329,8 +335,10 @@
 
 # Add after the "Find AAP installer playbook" task:
 - name: "Debug - Show AAP installer directory contents"
-  ansible.builtin.shell: "ls -la /tmp/{{ aapfolderpath }}"
+  ansible.builtin.command:
+    cmd: "ls -la /tmp/{{ aapfolderpath }}"
   register: aap_containerized_dir_contents
+  changed_when: false
 
 - name: "Debug - Display directory contents"
   ansible.builtin.debug:
@@ -368,11 +376,11 @@
   become: true
 
 - name: "Run AAP containerized installation using collection"
-  ansible.builtin.shell: |
-    cd /tmp/{{ aapfolderpath }} && \
-    ansible-playbook -i /tmp/inventory-growth \
-    ansible.containerized_installer.install
+  ansible.builtin.command:
+    cmd: ansible-playbook -i /tmp/inventory-growth ansible.containerized_installer.install
+    chdir: "/tmp/{{ aapfolderpath }}"
   register: aap_containerized_install_result
+  become: true
   become_user: aap
   environment:
     ANSIBLE_COLLECTIONS_PATH: "/tmp/{{ aapfolderpath }}/collections"
